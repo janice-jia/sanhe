@@ -7,20 +7,20 @@
             <img src="../assets/img/avatars.jpg" alt="">
           </div>
           <div class="info">
-            <p class="name">19系-兰兰</p>
+            <p class="name">{{myInfo.grade}}-{{myInfo.realname}}</p>
             <p class="s-info">
-              <span>基础信息</span>
-              <span>学号等内容</span>
-              <span>学号等内容</span>
+              <span>学号：{{myInfo.student_num}}</span>
+              <span>班级：{{myInfo.classroom}}</span>
+              <span>专业：{{myInfo.major}}</span>
             </p>
           </div>
         </div>
         <div class="user-nav">
           <ul>
-            <li><router-link to="userfinish">已完成</router-link></li>
-            <li><router-link to="userexaming">考试中</router-link></li>
-            <li><router-link to="userexamfinish">已考试</router-link></li>
-            <li class="hover"><router-link to="usermessage">我的消息</router-link></li>
+            <li :class="{hover:$route.name == 'userfinish'}"><router-link :to="{name:'userfinish'}">已完成</router-link></li>
+            <li :class="{hover:$route.name == 'userexaming'}"><router-link :to="{name:'userexaming'}">考试中</router-link></li>
+            <li :class="{hover:$route.name == 'userexamfinish'}"><router-link :to="{name:'userexamfinish'}">已考试</router-link></li>
+            <li :class="{hover:$route.name == 'usermessage'}"><router-link to="usermessage">我的消息</router-link></li>
           </ul>
         </div>
       </div>
@@ -32,13 +32,20 @@ export default {
   name: 'userheader',
   data() {
     return {
+      myInfo: {}
     }
   },
   mounted(){
+    this.GetUserInfo()
   },
   components: {
   },
   methods: {
+    GetUserInfo(){
+      this.$http.get('/API/My/MyInfo.ashx?command=GetMyInfo&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        this.myInfo = res.body.data || {}
+      })
+    }
   }
 }
 </script>
@@ -59,7 +66,7 @@ export default {
         border-radius: 50%;
       }
       .info{
-        width: 500px;
+        width: 1000px;
         float: left;
         padding-top:60px;
         p{
@@ -109,6 +116,125 @@ export default {
           }
         }
       } 
+    }
+  }
+}
+
+.usermessage{
+  min-height: 600px;
+  .sh-user-message{
+    .el-tabs__item{
+      font-size: 18px;
+      color: #333333;
+      &.is-active{
+        color: #3333ff;
+      }
+    }
+    .el-tabs__header{
+      padding-left: 40px;
+    }
+    .el-tabs__active-bar{
+      background: none;
+    }
+    .el-tabs__nav-wrap::after{
+      background: none;
+    }
+
+    .sh-message-item{
+      padding: 30px 40px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      .m-name{
+        font-size: 18px;
+        height: 20px;
+        line-height: 20px;
+        overflow: hidden;
+        color: #333333;
+      }
+      .m-con{
+        font-size: 16px;
+        line-height: 25px;
+        padding: 20px 0 5px 0;
+        color: #666666;
+      }
+      .m-time{
+        margin-top: 15px;
+        padding-top: 5px;
+        font-size: 12px;
+        color: #999999;
+        .m-icon{
+          display: inline-block;
+          width: 32px;
+          height: 26px;
+          background: url(../assets/img/m-d.png) no-repeat;
+          cursor: pointer;
+          float: right;
+          &:hover{
+            background: url(../assets/img/m-h.png) no-repeat;
+          }
+        }
+      }
+      // 回复消息内容
+      .replay-con{
+        padding-left: 2em;
+        font-size: 16px;
+        color: #666666;
+        span{
+          color: #3333ff;
+        }
+      }
+      // 回复消息--编辑框
+      .replay-msg{
+        margin-top: 15px;
+        textarea{
+          height: 110px;
+          width: 100%;
+          border: 1px solid #e5e5e5;
+          padding: 20px;
+          font-size: 16px;
+          line-height: 22px;
+          color: #999999;
+          resize: none;
+          border-radius: 5px;
+        }
+        button{
+          margin-top: 17px;
+        }
+      }
+    }
+  } 
+  
+  .sh-page{
+    background: #ffffff;
+    text-align: center;
+    padding: 40px 0  50px 0;
+    position: relative;
+    .current{
+      display: inline-block;
+      height: 26px;
+      line-height: 26px;
+      background: #3333ff;
+      color: #ffffff;
+      width: 30px;
+      text-align: center;
+      margin: 0 15px;
+      border-radius: 3px;
+    }
+    .prev,.next{
+      display: inline-block;
+      padding: 0 10px;
+      height: 26px;
+      line-height: 26px;
+      border: 1px solid #e5e5e5;
+      border-radius: 3px;
+    }
+    .total{
+      position: absolute;
+      left: 60px;
+      top: 45px;
+      font-size: 12px;
+      color: #999999;
+      letter-spacing: 3px;
     }
   }
 }

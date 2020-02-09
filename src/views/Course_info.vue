@@ -20,9 +20,9 @@
           <div class="tit">{{CourseInfo.coursename}}</div>
           <div class="desc-info">
             <el-row>
-              <el-col :span="8">授课老师：</el-col>
+              <!-- <el-col :span="8">授课老师：</el-col>
               <el-col :span="8">教程程度：</el-col>
-              <el-col :span="8">所需基础：无要求</el-col>
+              <el-col :span="8">所需基础：无要求</el-col> -->
               <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col>
             </el-row>
           </div>
@@ -31,7 +31,8 @@
             <div class="progress-txt">已完成：2/4课时</div>
           </div>
           <div class="start">
-            <a href="" class="btn btn-hover">继续学习</a>
+            <!-- <a href="#" class="btn btn-hover">继续学习</a> -->
+            <span class="btn btn-hover">继续学习</span>
           </div>
         </div> 
         <div style="clear:both"></div>
@@ -39,12 +40,13 @@
       <!-- 第一学期  第二学期 -->
       <div class="sh-classinfo-02">
         <div class="sh-classinfo-02-l">
+          <p class="null-con" v-if="CoursePeriod.length == 0">暂无内容</p>
           <el-tabs v-model="hoverPeriodname" @tab-click="GetCourseWare">
             <el-tab-pane v-for="item in CoursePeriod" :key="item.id" :label="item.periodname" :name="'period'+item.id">
               <!-- 第一学期 -->
               <div class="sh-semester-class">
                 <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
-                  <div class="sh-class-item-l video">{{ware.filename}}</div>
+                  <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
                   <div class="sh-class-item-r">00:00:00</div>
                 </div>
                 <!-- <div class="sh-class-item">
@@ -80,6 +82,7 @@ export default {
       CourseInfo: {
         coursetype: '',
       },
+      clientHeight: 650,
       // 学期列表
       CoursePeriod: [],
       // 学期下的数据
@@ -91,10 +94,20 @@ export default {
     this.GetCourseInfo(this.$route.params.courseid)
     //获取学期
     this.GetCoursePeriod()
+    this.getClientHeight()
   },
   components: {
   },
   methods: {
+    // 获取窗口可视高度
+    getClientHeight(){
+      if(document.body.clientHeight&&document.documentElement.clientHeight){
+        this.clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+      } else{
+        this.clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+      }
+    },
+
     // 详细信息
     GetCourseInfo(courseid){
       // console.info('courseid', courseid)
@@ -105,17 +118,21 @@ export default {
       })
     },
     // 课件列表  periodid(学期id)
-    GetCourseWare(tab, event){
+    GetCourseWare(tab){
       let periodid = this.CoursePeriod[tab.index].id
       // console.info('periodid', periodid)
       this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&periodid='+periodid+'&courseid='+this.$route.params.courseid).then(function (res) {
         this.CourseWare = res.body.dataList || []
       })
     },
+    // 学期列表
     GetCoursePeriod(){
       this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid='+this.$route.params.courseid).then(function (res) {
         this.CoursePeriod = res.body.dataList || []
-        if(this.CoursePeriod && this.CoursePeriod.length > 0) this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
+        if(this.CoursePeriod && this.CoursePeriod.length > 0) {
+          this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
+          this.GetCourseWare({index:0})
+        }
         console.info('this.CoursePeriod',this.CoursePeriod)
       })
     },
@@ -126,7 +143,7 @@ export default {
 
       },1000)
       if(ware.filetype != '视频'){
-        playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=http://q4yq6qvpu.bkt.clouddn.com/CallThink%20%E7%94%B5%E8%A7%86%E8%B4%AD%E7%89%A9%E5%91%BC%E5%8F%AB%E4%B8%AD%E5%BF%83%E7%B3%BB%E7%BB%9F.ppt " scrolling="auto" frameborder="0"  style="width: 100%;height: calc( 100% - 2px )"></iframe>`
+        playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileurl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
       } else {
         playDom = `<video src="${ware.fileurl}" width="100%" controls="controls">
                 您的浏览器不支持 video 标签。
@@ -148,22 +165,6 @@ export default {
 </script>
 <style lang="scss">
 .classinfo{
-  // 面包屑
-  .sh-crumbs{
-    padding: 30px 0;
-    .el-breadcrumb__item{
-      float: none;
-    }
-    .el-breadcrumb__inner{
-      color: #666666;
-      font-size: 18px!important;
-      line-height: 18px;
-    }
-    .el-breadcrumb__separator[class*=icon]{
-      color: #666666;
-      font-size: 18px;
-    }
-  }
   .sh-classinfo-01{
     padding: 20px;
     background: #ffffff;
@@ -237,8 +238,15 @@ export default {
     .sh-classinfo-02-l{
       padding: 0 30px;
       width: 750px;
+      min-height: 180px;
       background: #ffffff;
       float: left;
+      .null-con{
+        font-size: 18px;
+        font-weight: 400;
+        color: #999999;
+        margin-top: 20px;
+      }
       .el-tabs__item{
         font-size: 18px;
         font-weight: 400;
@@ -288,7 +296,7 @@ export default {
       min-height: 86px;
       .sh-class-item{
         padding: 0 10px;
-        height: 40px;
+        // height: 40px;
         line-height: 40px;
         font-size: 18px;
         color: #333333;
@@ -304,17 +312,17 @@ export default {
           }
           .video{
             &::before{
-              background: url(../assets/img/tit-v-default.png) no-repeat;
+              background: url(../assets/img/tit-v-default.png) no-repeat!important;
             }
           }
           .ppt{
             &::before{
-              background: url(../assets/img/tit-p.png) no-repeat;
+              background: url(../assets/img/tit-p.png) no-repeat!important;
             }
           }
           .word{
             &::before{
-              background: url(../assets/img/tit-w.png) no-repeat;
+              background: url(../assets/img/tit-w.png) no-repeat!important;
             }
           }
         }
@@ -334,17 +342,17 @@ export default {
         }
         .video{
           &::before{
-            background: url(../assets/img/tit-v-default.png) no-repeat;
+            background: url(../assets/img/tit-v-default.png) no-repeat!important;
           }
         }
         .ppt{
           &::before{
-            background: url(../assets/img/tit-p.png) no-repeat;
+            background: url(../assets/img/tit-p-default.png) no-repeat!important;
           }
         }
         .word{
           &::before{
-            background: url(../assets/img/tit-w.png) no-repeat;
+            background: url(../assets/img/tit-w-default.png) no-repeat!important;
           }
         }
         .sh-class-item-r{
@@ -359,8 +367,9 @@ export default {
 
 // 弹窗
 .el-message-box{
-  width: 80%!important;
-  max-width: 1200px;
+  width: 92%!important;
+  // max-width: 1200px;
+  min-height:92%;
 }
 </style>
 

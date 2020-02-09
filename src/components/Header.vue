@@ -7,8 +7,8 @@
       </el-col>
       <el-col :span="14" class="nav-menu">
         <ul>
-          <li class="hover"><router-link to="home" target="_blank">首页</router-link></li>
-          <li><router-link to="home" target="_blank">考试中心</router-link></li>
+          <li :class="{hover:$route.name == 'home'}"><router-link :to="{name:'home'}" target="_blank">首页</router-link></li>
+          <li :class="{hover:$route.name == 'exam'}"><router-link :to="{name:'exam'}" target="_blank">考试中心</router-link></li>
         </ul>
       </el-col>
       <el-col :span="6" class="nav-btn">
@@ -28,8 +28,13 @@ export default {
   name: 'Header',
   data() {
     return {
-      showApp: false
+      hoveIndex: 0
     }
+  },
+  mounted(){
+    if(this.$route.name == 'exam') this.hoveIndex = 1
+  },
+  methods: {
   }
 }
 </script>

@@ -35,7 +35,7 @@
                           </div>
                           <!-- tit-v  tit-p tit-w -->
                           <div class="tit ">{{clist.coursename}}</div>
-                          <div class="desc">授课老师教：杨华</div>
+                          <div class="desc">授课老师：杨华</div>
                         </router-link>
                       </el-col>
                     </el-row>
@@ -78,15 +78,15 @@ export default {
     },
     // 切换专业选项卡
     changeCourse(tab, event) {
-      console.log('tab', tab);
-      console.log('event', event);
+      // console.log('tab', tab);
+      // console.log('event', event);
       this.GetCourseList(this.MajorList[tab.index].id)
     },
     GetBanner(){
       this.$http.get('/API/Advertisement.ashx?command=GetBanner').then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
-        this.BannerList = res.body.dataList
-        console.info('this.BannerList', this.BannerList)
+        this.BannerList = res.body.dataList || []
+        // console.info('this.BannerList', this.BannerList)
       })
     },
     // 课程列表
@@ -96,9 +96,9 @@ export default {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseList = res.body.dataList
         // console.info('this.CourseList', res.body)
-        this.CourseList = this.formatterTagType(this.CourseList, 'coursetype')
+        if(this.CourseList && this.CourseList.length > 0) this.CourseList = this.formatterTagType(this.CourseList, 'coursetype')
         this.activeVideoType = 'activeVideoType0'
-         console.info('this.CourseList', this.CourseList)
+        //  console.info('this.CourseList', this.CourseList)
       })
     },
     // 专业列表
