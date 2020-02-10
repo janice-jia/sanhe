@@ -1,7 +1,6 @@
 <template>
   <div class="classinfo">
     <div class="container">
-
       <!-- 面包屑 -->
       <div class="sh-crumbs">
         <el-breadcrumb separator-class="el-icon-arrow-right">
@@ -27,8 +26,8 @@
             </el-row>
           </div>
           <div class="progress">
-            <div class="progress-box"><el-progress :percentage="70"></el-progress></div>
-            <div class="progress-txt">已完成：2/4课时</div>
+            <div class="progress-box"><el-progress :percentage="Shedule.percentage"></el-progress></div>
+            <div class="progress-txt">已完成：{{Shedule.complete}} / {{Shedule.coursewarecount}}课时</div>
           </div>
           <div class="start">
             <!-- <a href="#" class="btn btn-hover">继续学习</a> -->
@@ -47,7 +46,11 @@
               <div class="sh-semester-class">
                 <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
                   <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
-                  <div class="sh-class-item-r">00:00:00</div>
+                  <div class="sh-class-item-r">
+                    <span style="font-size:16px;margin-right:70px;color:#999999">{{ware.schedule}}</span>
+                    <span style="font-size:16px;" v-if="ware.totaltime">{{ware.totaltime}}分钟</span>
+                    <span style="font-size:16px;" v-if="!ware.totaltime">0分钟</span>
+                  </div>
                 </div>
                 <!-- <div class="sh-class-item">
                   <div class="sh-class-item-l">L1:草图编辑</div>
@@ -70,6 +73,10 @@
         <div style="clear:both"></div>
       </div>      
     </div>
+
+    <el-dialog width="90%" custom-class="video" style="height:96%;margin-top:0!important;" :before-close="SetCourseWareStudySchedule" :visible.sync="dialogTableVisible" :destroy-on-close="true">
+      <div id="video" :style="{height: clientHeight - 200 + 'px'}"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -86,14 +93,23 @@ export default {
       // 学期列表
       CoursePeriod: [],
       // 学期下的数据
-      CourseWare:[]
+      CourseWare:[],
+      dialogTableVisible: false,
+      // 当前观看的视频
+      selectVideoItem:{},
+      actuallytime:0,
+      // 定时器
+      timer: null,
+      periodid: null,
+      // 进度
+      Shedule:{}
     }
   },
   mounted(){
-    // console.info('$state', this.$route)
-    this.GetCourseInfo(this.$route.params.courseid)
     //获取学期
     this.GetCoursePeriod()
+    // console.info('$state', this.$route)
+    this.GetCourseInfo(this.$route.params.courseid)
     this.getClientHeight()
   },
   components: {
@@ -106,12 +122,14 @@ export default {
       } else{
         this.clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
       }
+      console.info('this.clientHeight', this.clientHeight)
     },
 
     // 详细信息
     GetCourseInfo(courseid){
       // console.info('courseid', courseid)
       if(!courseid) return
+      let THIS = this
       this.$http.get('/API/Study/Course.ashx?command=GetCourseById&courseid='+courseid).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseInfo = res.body.data
@@ -120,9 +138,23 @@ export default {
     // 课件列表  periodid(学期id)
     GetCourseWare(tab){
       let periodid = this.CoursePeriod[tab.index].id
+      this.periodid = periodid
+      let THIS = this
       // console.info('periodid', periodid)
-      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&periodid='+periodid+'&courseid='+this.$route.params.courseid).then(function (res) {
+      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
         this.CourseWare = res.body.dataList || []
+
+        setTimeout(function(){
+          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
+            THIS.Shedule = res.body[0]
+            if(THIS.Shedule.complete == 0 ){
+              THIS.Shedule.percentage = 0
+            }else{
+              THIS.Shedule.percentage =  parseInt(THIS.Shedule.coursewarecount / THIS.Shedule.complete)
+            }
+            // console.info('res.body', res.body)
+          })
+        },300)
       })
     },
     // 学期列表
@@ -132,33 +164,75 @@ export default {
         if(this.CoursePeriod && this.CoursePeriod.length > 0) {
           this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
           this.GetCourseWare({index:0})
+          this.periodid = this.CoursePeriod[0].id
         }
         console.info('this.CoursePeriod',this.CoursePeriod)
       })
     },
     open(ware){
       console.info('ware', ware)
+      this.selectVideoItem = ware
       let playDom = ''
-      var timer = setInterval(function(){
-
+      // 视频观看定时器
+      let _this = this
+      this.timer = setInterval(function(){
+        _this.actuallytime += 1
       },1000)
       if(ware.filetype != '视频'){
         playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileurl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
+        this.$alert(playDom, ware.filetname, {
+          confirmButtonText: '关闭',
+          dangerouslyUseHTMLString: true,
+          callback: action => {
+            // console.info('action===',action)
+            // 移除元素
+            document.getElementsByClassName('el-message-box__wrapper')[0].remove();
+            this.SetCourseWareStudySchedule()
+          }
+        });
       } else {
-        playDom = `<video src="${ware.fileurl}" width="100%" controls="controls">
-                您的浏览器不支持 video 标签。
-                </video>`
+        this.dialogTableVisible = true
+        let fileType = ware.fileurl.substring(ware.fileurl.length-3,ware.fileurl.length);
+        setTimeout(function(){
+          document.getElementById('video').style.height = this.clientHeight-150 +'px'
+          var videoObject = {
+            container: '#video', //容器的ID或className
+            variable: 'player', //播放函数名称
+            //loop: true, //播放结束是否循环播放
+            autoplay: true,//是否自动播放
+            timeScheduleAdjust: 5, 
+            // poster: 'material/poster.jpg', //封面图片
+            //flashplayer:true,
+            //live:true,
+            //debug:true,
+            wh:'16:9',
+            video:[
+                [ware.fileurl, 'video/'+fileType, '中文标清', 0],
+            ]
+          };
+          var player = new ckplayer(videoObject);
+        }, 500)
+        // playDom = `<video src="${ware.fileurl}" width="100%" height="92%" style="max-width:100%;max-height:100%" controls="controls">
+        //         您的浏览器不支持 video 标签。
+        //         </video>`
       }
-      this.$alert(playDom, ware.filetname, {
-        confirmButtonText: '关闭',
-        dangerouslyUseHTMLString: true,
-        callback: action => {
-          // console.info('action===',action)
-          // 移除元素
-          document.getElementsByClassName('el-message-box__wrapper')[0].remove();
-          clearInterval(timer);
-        }
-      });
+      
+    },
+    SetCourseWareStudySchedule(done){
+      clearInterval(this.timer);
+      console.info('this.actuallytime', this.actuallytime)
+      if(!this.actuallytime) {
+        if(done()) done();
+        return
+      }
+      let actuallytime = parseInt(this.actuallytime / 60)
+      if(actuallytime < 1) actuallytime = 1
+      console.info('this.selectVideoItem', this.selectVideoItem)
+      console.info('actuallytime', actuallytime)
+      this.$http.get('/API/Study/CourseWare.ashx?command=SetCourseWareStudySchedule&userid='+this.GLOBAL.CurrentUserId+'&coursewareid='+this.selectVideoItem.id+'&totaltime='+this.selectVideoItem.totaltime+'&actuallytime='+actuallytime).then(function (res) {
+        console.info('res.body', res.body)
+      })
+      if(done()) done();
     }
   }
 }
@@ -295,6 +369,7 @@ export default {
       padding: 0 0 60px 0;
       min-height: 86px;
       .sh-class-item{
+        clear: both;
         padding: 0 10px;
         // height: 40px;
         line-height: 40px;
@@ -327,7 +402,7 @@ export default {
           }
         }
         .sh-class-item-l{
-          width: 50%;
+          width: 65%;
           float: left;
           position: relative;
           padding: 0 0 0 37px;
@@ -370,6 +445,13 @@ export default {
   width: 92%!important;
   // max-width: 1200px;
   min-height:92%;
+}
+
+.el-dialog{
+  width: 92%!important;
+  // max-width: 1200px;
+  min-height:92%;
+  max-width: 95%;
 }
 </style>
 

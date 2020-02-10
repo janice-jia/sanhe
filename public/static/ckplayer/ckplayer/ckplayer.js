@@ -42,7 +42,7 @@ function ckplayerConfig() {
 			},
 			timeJump: 10,//快进快退时的秒数
 			volumeJump: 0.1,//音量调整的数量，大于0小于1的小数
-			timeScheduleAdjust: 1,//是否可调节调节栏,0不启用，1是启用，2是只能前进（向右拖动），3是只能后退，4是只能前进但能回到第一次拖动时的位置，5是看过的地方可以随意拖动
+			timeScheduleAdjust: 5,//是否可调节调节栏,0不启用，1是启用，2是只能前进（向右拖动），3是只能后退，4是只能前进但能回到第一次拖动时的位置，5是看过的地方可以随意拖动
 			previewDefaultLoad: true,//预览图片是否默认加载，优点是鼠标第一次经过进度条即可显示预览图片
 			promptSpotTime: false,//提示点文字是否在前面加上对应时间
 			buttonMode: {
@@ -691,6 +691,14 @@ function ckplayerConfig() {
 				height: '100%',
 				fontFamily: this.fontFamily
 			});
+			clientHeight = '650'
+			if(document.body.clientHeight&&document.documentElement.clientHeight){
+				clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+			} else{
+				clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+			}
+			console.info('this.clientHeight====', clientHeight)
+			document.getElementById('video').style.height = this.clientHeight-150 +'px'
 			if (this.html5Video) { //如果支持HTML5-VIDEO则默认使用HTML5-VIDEO播放器
 				//禁止播放器容器上鼠标选择文本
 				this.PD.onselectstart = this.PD.ondrag = function() {
@@ -788,9 +796,18 @@ function ckplayerConfig() {
 						this.V.playbackRate = this.playbackRateArr[this.playbackRateDefault][0]; //定义倍速
 					}
 				} catch(error) {}
+				console.info('111')
+				// 获取窗口可视高度
+				var clientHeight = '650'
+				if(document.body.clientHeight&&document.documentElement.clientHeight){
+					clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+				} else{
+					clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;
+				}
+				console.info('this.clientHeight====', clientHeight)
 				this.css(this.V, {
 					width: '100%',
-					height: '100%'
+					height: clientHeight-250 + 'px'
 				});
 				if (this.isM3u8) {
 					var loadJsHandler = function() {

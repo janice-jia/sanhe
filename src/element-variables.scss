@@ -97,3 +97,9 @@ li{
         }
     }
 }
+.el-dialog__body{
+    max-height: 100%!important;
+    margin-top: 0!important;
+    height: 92%;
+    min-height: 92%;
+}

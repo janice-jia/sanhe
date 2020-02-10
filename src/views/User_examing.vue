@@ -4,18 +4,19 @@
       <UserHeader></UserHeader>
 
       <div class="sh-user-message">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane v-if="item in CourseList" :label="item.coursetype" name="first">
+        <el-tabs v-model="currentCouse" @tab-click="handleClick">
+          <el-tab-pane v-for="item in MajorList" :key="item.id" :label="item.coursename" :name="'course'+item.id">
             <div class="sh-exam-item">
               <el-row :gutter="20">
                 <el-col :span="12" v-for="clist in CourseList" :key="clist.id">
                   <div class="sh-exam-item-box">
                     <div class="grid-content bg-purple">
-                      <img :src="clist.logo_url" :alt="clist.coursename">
+                      <img v-if="!clist.logo_url" src="../assets/img/exam-default.jpg" alt="">
+                      <img v-if="clist.logo_url" :src="clist.logo_url" :alt="clist.coursename">
                     </div>
                     <div class="info">
                       <!-- tit-v  tit-p tit-w -->
-                      <div class="tit ">{{clist.examinationname}}</div>
+                      <div class="tit ">{{clist.coursename}}</div>
                       <div class="desc">授课老师：杨华</div>
                       <div class="num">
                         <span>得分：{{clist.points ? clist.points : 0}}</span>
@@ -24,7 +25,7 @@
                       <div class="link">
                         <router-link class="btn btn-hover" 
                           :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,'currentPageName': clist.examinationname}}" target="_blank">
-                          去考试
+                          继续考试
                         </router-link>
                       </div>
                     </div>
@@ -48,26 +49,40 @@ export default {
   name: 'usermessage',
   data() {
     return {
-      activeName: 'first',
-      CourseList:[]
+      // 专业列表
+      MajorList:[],
+      // 课程列表
+      CourseList:[],
+      currentCouse:null
     }
   },
   mounted(){
-    // 获取已考试的课程
-    this.GetCourseList()
+    // 获取已考试的专业课程
+    this.GetMajorList()
   },
   components: {
     UserHeader
   },
   methods: {
     handleClick(tab, event) {
-      console.log(tab, event);
+      this.GetCourseList(this.MajorList[tab.index].id)
     },
-    // 获取已考试的课程
-    GetCourseList(){
-      this.$http.get('/API/My/MyInfo.ashx?command=GetCourseListByState&userid='+this.GLOBAL.CurrentUserId+'state=考试中').then(function (res) {
-        this.CourseList = res.body.dataList || []
-        console.info('this.CourseList', this.CourseList)
+    // 获取已考试的专业列表
+    GetMajorList(){
+      this.$http.get('/API/My/MyInfo.ashx?command=GetCourseListByState&userid='+this.GLOBAL.CurrentUserId+'&state=考试中').then(function (res) {
+        this.MajorList = res.body.dataList || []
+        // console.info('this.CourseList', this.CourseList)
+        if(this.MajorList && this.MajorList.length > 0){
+          this.currentCouse = 'course'+this.MajorList[0].id
+          this.GetCourseList(this.MajorList[0].id)
+        }
+      })
+    },
+    // 课程列表
+    GetCourseList(courseid){
+      if(!courseid) return;
+      this.$http.get('/API/Exam/ExaminationPaper.ashx?command=GetExaminationsByCourseId&majorid=' + this.GLOBAL.MajorId + '&courseid='+courseid +'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        this.CourseList = res.body.dataList
       })
     }
   }

@@ -39,7 +39,26 @@
           <!-- <el-tab-pane label="回复消息" name="second">
             回复消息
           </el-tab-pane> -->
+
+
+        <div class="replay-msg-box">
+          <span style="font-size:18px; color:#666666">请选择老师：</span>
+          <el-select v-model="teacherid" placeholder="请选择">
+            <el-option
+              v-for="item in TeachersList"
+              :key="item.id"
+              :label="item.realname"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          <div class="replay-msg">
+            <textarea v-model="teachermsg" name="" id="" cols="30" rows="10" placeholder="请输入文字…"></textarea>
+            <button class="btn btn-hover" @click="sendMsg()">发表</button>
+          </div>
+        </div> 
         </el-tabs>
+
+        
       </div>
     </div>
   </div>
@@ -56,12 +75,16 @@ export default {
       // 回复消息框显示状态
       replayMsgState: null,
       // 回复消息框内容
-      msgcontent: ''
+      msgcontent: '',
+      teacherid: null,
+      teachermsg:null,
+      TeachersList: []
     }
   },
   mounted(){
     // 获取消息列表
-    this.GetMsg()
+    this.GetMsg(),
+    this.getTeachers()
   },
   components: {
     UserHeader
@@ -69,6 +92,11 @@ export default {
   methods: {
     handleClick(tab, event) {
       console.log(tab, event);
+    },
+    getTeachers(){
+      this.$http.get('/API/Msg/Message.ashx?command=GetTeachers').then(function (res) {
+        this.TeachersList = res.body.dataList || []
+      })
     },
     // 获取消息列表
     GetMsg() {
@@ -122,6 +150,27 @@ export default {
           this.replayMsgState = null
           this.msgcontent = ''
           // this.$router.push({name: 'usermessage'})
+          this.$router.go(0)
+        }else{
+          this.$message.error('回复失败');
+          return
+        }
+      })
+    },
+    // 发送消息
+    sendMsg(){
+      if(!this.teacherid){
+        this.$message.error('请选择老师');
+        return
+      }
+      if(!this.teachermsg){
+        this.$message.error('请输入内容');
+        return
+      }
+      this.$http.get('/API/Msg/Message.ashx?command=Send&userid='+this.GLOBAL.CurrentUserId+'&receiveuserid='+this.teacherid+'&msgcontent='+this.teachermsg).then(function (res) {
+        if(res.body.state == 'success'){
+          // this.$router.push({name: 'usermessage'})
+          this.$message('发送成功');
           this.$router.go(0)
         }else{
           this.$message.error('回复失败');

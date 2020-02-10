@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import VueResource from 'vue-resource'
+import VueCookies from 'vue-cookies'
 import 'lib-flexible'
 import './plugins/element.js'
 import VueDirectiveImagePreviewer from 'vue-directive-image-previewer'
@@ -10,30 +11,16 @@ import 'vue-directive-image-previewer/dist/assets/style.css'
 Vue.config.productionTip = false
 Vue.use(VueResource)
 Vue.use(VueDirectiveImagePreviewer) 
+Vue.use(VueCookies) 
 
+// 测试---设置cookie
+// Vue.$cookies.set("CurrentUserId","1465")    
+// Vue.$cookies.set("CurrentUserName","306201903000100187")    
+// Vue.$cookies.set("MajorId","20")    
 
-// let setCookie = function(name,value){
-//   var Days = 30;
-//   var exp = new Date();
-//   exp.setTime(exp.getTime() + Days*24*60*60*1000);
-//   document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
-// }
-// setCookie('CurrentUserId','1465')
-// setCookie('CurrentUserName','306201903000100187')
-
-// 获取cookie
-let getCookie = function (name) {
-  var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-  if (arr = document.cookie.match(reg)) {
-    return unescape(arr[2]);
-  } else {
-    return null;
-  }
-}
-
-let CurrentUserId = getCookie('CurrentUserId')
-let CurrentUserName = getCookie('CurrentUserName')
-let MajorId = getCookie('MajorId') || 20
+let CurrentUserId = Vue.$cookies.get('CurrentUserId')
+let CurrentUserName = Vue.$cookies.get('CurrentUserName')
+let MajorId = Vue.$cookies.get('MajorId') || 20
 
 Vue.prototype.GLOBAL = {
   'CurrentUserId': CurrentUserId,
@@ -43,7 +30,7 @@ Vue.prototype.GLOBAL = {
 
 // 验证是否登录
 if(!CurrentUserId || !CurrentUserName) 
-window.location.href='http://124.238.153.171:82/school-cas/login?service=http://47.92.34.245:9000'
+window.location.href='http://124.238.153.171:82/school-cas/login?service=http://47.92.34.245:9000/AuthUser.aspx'
 
 new Vue({
   router,

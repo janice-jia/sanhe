@@ -123,6 +123,9 @@ export default {
 .usermessage{
   min-height: 600px;
   .sh-user-message{
+    .sh-exam-item{
+      margin-top: 0;
+    }
     .el-tabs__item{
       font-size: 18px;
       color: #333333;
@@ -183,24 +186,7 @@ export default {
           color: #3333ff;
         }
       }
-      // 回复消息--编辑框
-      .replay-msg{
-        margin-top: 15px;
-        textarea{
-          height: 110px;
-          width: 100%;
-          border: 1px solid #e5e5e5;
-          padding: 20px;
-          font-size: 16px;
-          line-height: 22px;
-          color: #999999;
-          resize: none;
-          border-radius: 5px;
-        }
-        button{
-          margin-top: 17px;
-        }
-      }
+      
     }
   } 
   
@@ -235,6 +221,35 @@ export default {
       font-size: 12px;
       color: #999999;
       letter-spacing: 3px;
+    }
+  }
+
+  // 回复消息--编辑框
+  .replay-msg-box{
+    background: #ffffff;
+    margin-top: 30px;
+    padding: 20px;
+    .el-select .el-input.is-focus .el-input__inner,
+    .el-select .el-input__inner:focus,
+    .el-select-dropdown__item.selected{
+      border-color: #3333ff;
+    }
+  }
+  .replay-msg{
+    margin-top: 15px;
+    textarea{
+      height: 110px;
+      width: 100%;
+      border: 1px solid #e5e5e5;
+      padding: 20px;
+      font-size: 16px;
+      line-height: 22px;
+      color: #999999;
+      resize: none;
+      border-radius: 5px;
+    }
+    button{
+      margin-top: 17px;
     }
   }
 }

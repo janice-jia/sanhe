@@ -35,7 +35,7 @@
                           </div>
                           <!-- tit-v  tit-p tit-w -->
                           <div class="tit ">{{clist.coursename}}</div>
-                          <div class="desc">授课老师：杨华</div>
+                          <!-- <div class="desc">授课老师：杨华</div> -->
                         </router-link>
                       </el-col>
                     </el-row>

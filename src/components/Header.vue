@@ -15,9 +15,9 @@
         <router-link class="btn btn-hover" to="usermessage" target="_blank">
           个人中心
         </router-link>
-        <router-link class="btn" to="home" target="_blank">
+        <button class="btn" @click="logout">
           退出
-        </router-link>
+        </button>
       </el-col>
     </el-row>
   </div>
@@ -35,6 +35,21 @@ export default {
     if(this.$route.name == 'exam') this.hoveIndex = 1
   },
   methods: {
+    logout(){
+      console.info('logout')
+      this.$cookies.set("CurrentUserId","")    
+      this.$cookies.set("CurrentUserName","")    
+      this.$cookies.set("MajorId","")
+
+      // 清除cookie 
+      this.$cookies.remove("CurrentUserId");
+      this.$cookies.remove("CurrentUserName");
+      this.$cookies.remove("MajorId");
+      let _this = this
+      setTimeout(function(){
+        _this.$router.go(0)
+      },300)
+    }
   }
 }
 </script>
@@ -55,10 +70,13 @@ export default {
       margin-left: 30px;
       cursor: pointer;
       border: none;
-      &:hover{
-        background: #3333ff;
-        color: #ffffff;
-      }
+      // &:hover{
+      //   background: #3333ff;
+      //   color: #ffffff;
+      // }
+    }
+    button{
+      cursor: pointer;
     }
   }
   .nav-menu{

@@ -26,10 +26,10 @@
         <div class="sh-examquestion-con">
             <div class="q-name">{{examCon.ordervalue}}、{{examCon.question}}</div>
             <div class="q-list">
-              <p><el-radio v-model="currentanswer" label="A">A: {{examCon.option1}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='A'" class="answer">A: {{examCon.option1}}</span></p>
-              <p><el-radio v-model="currentanswer" label="B">B: {{examCon.option2}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='B'" class="answer">B: {{examCon.option2}}</span></p>
-              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="C">C: {{examCon.option3}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='C'" class="answer">C: {{examCon.option3}}</span></p>
-              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="D">D: {{examCon.option4}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='D'" class="answer">D: {{examCon.option4}}</span></p>
+              <p><el-radio v-model="currentanswer" label="A">A: {{examCon.option1}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='A'" class="answer">正确答案 A: {{examCon.option1}}</span></p>
+              <p><el-radio v-model="currentanswer" label="B">B: {{examCon.option2}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='B'" class="answer">正确答案 B: {{examCon.option2}}</span></p>
+              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="C">C: {{examCon.option3}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='C'" class="answer">正确答案 C: {{examCon.option3}}</span></p>
+              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="D">D: {{examCon.option4}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='D'" class="answer">正确答案 D: {{examCon.option4}}</span></p>
             </div>
             <div class="q-progress">
               <el-progress :percentage="progress" :text-inside="true" :color="customColor" :format="format"></el-progress>
@@ -42,7 +42,7 @@
                 <el-col :span="6">{{examCon.ordervalue}}/{{$route.query.questionscount}}</el-col>
                 <el-col :span="6" class="next">
                   <span v-if="examCon.ordervalue != $route.query.questionscount"  @click="GetNext">下一题</span>
-                  <span v-if="examCon.ordervalue == $route.query.questionscount"  @click="submitExam">完成</span>
+                  <span v-if="examCon.ordervalue == $route.query.questionscount"  @click="submitExam">交卷</span>
                 </el-col>
               </el-row>
               
@@ -83,19 +83,35 @@ export default {
         this.progress = (this.examCon.ordervalue) * 100 / this.$route.query.questionscount
         this.currentanswer = null
         if(this.$route.pageuse == 'see') this.currentanswer = this.examCon.currentanswer
+        // 获取当前题目选项
+        if(this.$route.query.pageuse == 'see'){
+          this.$http.get('/API/Exam/ExaminationQuestion.ashx?command=GetCurrentAnswer&userid='+this.GLOBAL.CurrentUserId+'&currentid='+this.examCon.id+'&examinationid='+this.$route.params.examinationid).then(function (res) {
+            this.currentanswer = res.body.data.selectedanswer || ''
+            // console.info('this.currentanswer',this.currentanswer)
+          })
+        }
       })
     },
     // 获取试卷下一题
     GetNext(){
-      if(!this.currentanswer){
+      if(!this.currentanswer && this.$route.query.pageuse != 'see'){
         this.$message.error('请选择答案');
         return
       }
+      
       this.$http.get('/API/Exam/ExaminationQuestion.ashx?command=GetNext&examinationid='+this.$route.params.examinationid+'&currentid='+this.examCon.id+'&currentanswer='+this.currentanswer+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
         this.examCon = res.body.data || {}
         this.progress = (this.examCon.ordervalue) * 100 / this.$route.query.questionscount
         this.currentanswer = null
+        // 获取当前题目选项
+        if(this.$route.query.pageuse == 'see'){
+          this.$http.get('/API/Exam/ExaminationQuestion.ashx?command=GetCurrentAnswer&userid='+this.GLOBAL.CurrentUserId+'&currentid='+this.examCon.id+'&examinationid='+this.$route.params.examinationid).then(function (res) {
+            this.currentanswer = res.body.data.selectedanswer || ''
+            // console.info('this.currentanswer',this.currentanswer)
+          })
+        }
       })
+      
     },
     // 获取试卷上一题
     GetPrev(){
@@ -105,6 +121,13 @@ export default {
         this.progress = (this.examCon.ordervalue) * 100 / this.$route.query.questionscount
         // console.info('this.progress', this.progress)
         this.currentanswer = this.examCon.selectedanswer || null
+        // 获取当前题目选项
+        if(this.$route.query.pageuse == 'see'){
+          this.$http.get('/API/Exam/ExaminationQuestion.ashx?command=GetCurrentAnswer&userid='+this.GLOBAL.CurrentUserId+'&currentid='+this.examCon.id+'&examinationid='+this.$route.params.examinationid).then(function (res) {
+            this.currentanswer = res.body.data.selectedanswer || ''
+            // console.info('this.currentanswer',this.currentanswer)
+          })
+        }
       })
     },
     // 提交试卷
