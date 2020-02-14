@@ -198,6 +198,9 @@ export default {
       } 
       .bg-purple{
         background: #d3dce6;
+        img{
+          max-width: 100%;
+        }
       }
                     
       .info{

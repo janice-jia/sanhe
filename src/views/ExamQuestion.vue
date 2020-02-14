@@ -132,7 +132,7 @@ export default {
     },
     // 提交试卷
     submitExam(){
-      this.$http.get('/API/Exam/StudentsExamination.ashx?command=Submit&examinationid='+this.$route.params.examinationid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+      this.$http.get('/API/Exam/StudentsExamination.ashx?command=Submit&examinationid='+this.$route.params.examinationid+'&userid='+this.GLOBAL.CurrentUserId+'&currentid='+this.examCon.id+'&currentanswer='+this.currentanswer).then(function (res) {
         if(res.body.state == 'success'){
           this.$router.push({name: 'examSubmit', query:{type:this.$route.query.type,currentPageName: this.$route.query.currentPageName}})
         }else{

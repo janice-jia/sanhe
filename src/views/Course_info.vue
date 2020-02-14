@@ -19,10 +19,18 @@
           <div class="tit">{{CourseInfo.coursename}}</div>
           <div class="desc-info">
             <el-row>
-              <!-- <el-col :span="8">授课老师：</el-col>
-              <el-col :span="8">教程程度：</el-col>
-              <el-col :span="8">所需基础：无要求</el-col> -->
+              <!-- <el-col :span="8">授课老师：</el-col> -->
               <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col>
+              <!-- <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }}分</el-col>
+              <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}}分</el-col> -->
+            </el-row>
+          </div>
+          <div class="desc-info">
+            <el-row>
+              <!-- <el-col :span="8">授课老师：</el-col> -->
+              <!-- <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col> -->
+              <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }}分</el-col>
+              <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}}分</el-col>
             </el-row>
           </div>
           <div class="progress">
@@ -74,7 +82,7 @@
       </div>      
     </div>
 
-    <el-dialog width="90%" custom-class="video" style="height:96%;margin-top:0!important;" :before-close="SetCourseWareStudySchedule" :visible.sync="dialogTableVisible" :destroy-on-close="true">
+    <el-dialog width="90%" top="5vh" custom-class="video" style="height:96%;margin-top:0!important;" :before-close="SetCourseWareStudySchedule" :visible.sync="dialogTableVisible" :destroy-on-close="true">
       <div id="video" :style="{height: clientHeight - 200 + 'px'}"></div>
     </el-dialog>
   </div>
@@ -102,7 +110,9 @@ export default {
       timer: null,
       periodid: null,
       // 进度
-      Shedule:{}
+      Shedule:{},
+      exampoints:'',
+      studypoints:''
     }
   },
   mounted(){
@@ -115,6 +125,21 @@ export default {
   components: {
   },
   methods: {
+    // 考试成绩
+    GetExaminationPoints(){
+      this.$http.get('/API/Exam/StudentsExamination.ashx?command=GetExaminationPoints&courseid='+this.CourseInfo.id+'&periodid='+this.periodid+'&majorid='+this.GLOBAL.MajorId+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        console.info('res.body.exampoints===', res.body.exampoints)
+        this.exampoints = res.body.exampoints
+      })
+    },
+    // 获取学习分数
+    GetCourseStudyPoints(){
+      this.$http.get('/API/Study/Course.ashx?command=GetCourseStudyPoints&courseid='+this.CourseInfo.id+'&periodid='+this.periodid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        // res.body = this.formatterNavVal(res.body, 'shipcompany')
+        console.info('res.body.studypoints===', res.body.studypoints)
+        this.studypoints = res.body.studypoints
+      })
+    },
     // 获取窗口可视高度
     getClientHeight(){
       if(document.body.clientHeight&&document.documentElement.clientHeight){
@@ -133,6 +158,8 @@ export default {
       this.$http.get('/API/Study/Course.ashx?command=GetCourseById&courseid='+courseid).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseInfo = res.body.data
+        // 获取考试成绩
+        this.GetExaminationPoints()
       })
     },
     // 课件列表  periodid(学期id)
@@ -155,11 +182,14 @@ export default {
             // console.info('res.body', res.body)
           })
         },300)
+
+        // 获取学习分数
+        this.GetCourseStudyPoints(periodid)
       })
     },
     // 学期列表
     GetCoursePeriod(){
-      this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid='+this.$route.params.courseid).then(function (res) {
+      this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid='+this.$route.params.courseid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
         this.CoursePeriod = res.body.dataList || []
         if(this.CoursePeriod && this.CoursePeriod.length > 0) {
           this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
@@ -194,7 +224,6 @@ export default {
         this.dialogTableVisible = true
         let fileType = ware.fileurl.substring(ware.fileurl.length-3,ware.fileurl.length);
         setTimeout(function(){
-          document.getElementById('video').style.height = this.clientHeight-150 +'px'
           var videoObject = {
             container: '#video', //容器的ID或className
             variable: 'player', //播放函数名称
@@ -269,8 +298,8 @@ export default {
       }
       // 进度条
       .progress{
-        height: 101px;
-        padding: 24px 0 0 0;
+        height: 80px;
+        padding: 20px 0 0 0;
         .progress-box{
           width: 306px;
           float: left;

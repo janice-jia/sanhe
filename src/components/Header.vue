@@ -37,10 +37,6 @@ export default {
   methods: {
     logout(){
       console.info('logout')
-      this.$cookies.set("CurrentUserId","")    
-      this.$cookies.set("CurrentUserName","")    
-      this.$cookies.set("MajorId","")
-
       // 清除cookie 
       this.$cookies.remove("CurrentUserId");
       this.$cookies.remove("CurrentUserName");
