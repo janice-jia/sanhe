@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import pdf from 'pdfobject'
+
 export default {
   name: 'classinfo',
   data() {
@@ -158,8 +160,6 @@ export default {
       this.$http.get('/API/Study/Course.ashx?command=GetCourseById&courseid='+courseid).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseInfo = res.body.data
-        // 获取考试成绩
-        this.GetExaminationPoints()
       })
     },
     // 课件列表  periodid(学期id)
@@ -177,7 +177,7 @@ export default {
             if(THIS.Shedule.complete == 0 ){
               THIS.Shedule.percentage = 0
             }else{
-              THIS.Shedule.percentage =  parseInt(THIS.Shedule.coursewarecount / THIS.Shedule.complete)
+              THIS.Shedule.percentage =  parseInt(THIS.Shedule.complete / THIS.Shedule.coursewarecount * 100) 
             }
             // console.info('res.body', res.body)
           })
@@ -185,6 +185,9 @@ export default {
 
         // 获取学习分数
         this.GetCourseStudyPoints(periodid)
+
+        // 获取考试成绩
+        this.GetExaminationPoints(periodid)
       })
     },
     // 学期列表
@@ -208,7 +211,7 @@ export default {
       this.timer = setInterval(function(){
         _this.actuallytime += 1
       },1000)
-      if(ware.filetype != '视频'){
+      if(ware.filetype != '视频' && ware.filetype != 'PDF'){
         playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileurl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
         this.$alert(playDom, ware.filetname, {
           confirmButtonText: '关闭',
@@ -220,7 +223,13 @@ export default {
             this.SetCourseWareStudySchedule()
           }
         });
+      }else if(ware.filetype == 'PDF'){
+        this.dialogTableVisible = true
+        setTimeout(function(){
+          pdf.embed(ware.fileurl, "#video");  
+        }, 300)
       } else {
+        // 视频
         this.dialogTableVisible = true
         let fileType = ware.fileurl.substring(ware.fileurl.length-3,ware.fileurl.length);
         setTimeout(function(){
@@ -314,13 +323,13 @@ export default {
             font-size: 16px;
             color: #333333;
             font-weight: 400;
-            padding-left: 10px;
+            padding-left: 5px;
           }
         }
         .progress-txt{
           font-size: 16px;
           color: #333333;
-          width: 200px;
+          width: 230px;
           float: left;
           padding-left: 60px;
         }
@@ -481,6 +490,10 @@ export default {
   // max-width: 1200px;
   min-height:92%;
   max-width: 95%;
+}
+#video{
+  height: 100%;
+  width: 100%;
 }
 </style>
 
