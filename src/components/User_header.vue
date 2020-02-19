@@ -154,6 +154,14 @@ export default {
         overflow: hidden;
         color: #333333;
       }
+      .m-receiveuser{
+        font-size: 18px;
+        height: 20px;
+        line-height: 20px;
+        overflow: hidden;
+        margin-top: 10px;
+        color: #333333;
+      }
       .m-con{
         font-size: 16px;
         line-height: 25px;

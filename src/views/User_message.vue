@@ -7,8 +7,9 @@
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane label="全部消息" name="first">
             <div class="sh-message-item" v-for="(item, index) in msgList" :key="item.id">
-              <p class="m-name">{{item.senduser}}</p>
-              <p class="m-con">{{item.msgcontent}}</p>
+              <p class="m-name">发送人：{{item.senduser}}</p>
+              <p class="m-receiveuser">收件人：{{item.receiveuser}}</p>
+              <p class="m-con">内容：{{item.msgcontent}}</p>
               <p v-for="replay in item.replaycon" :key="replay.id" class="replay-con">
                 <span>回复@{{replay.receiveuser}}：</span>{{replay.msgcontent}}
               </p>
@@ -17,7 +18,7 @@
                 <button class="btn btn-hover" @click="sendReplay(item.senduserid)">发表</button>
               </div>
               <p class="m-time" v-if="replayMsgState == null && index != replayMsgState">
-                {{item.createdatetime}}
+                发送时间：{{item.createdatetime}}
                 <span class="m-icon" @click="replayMsg(index)"></span>
               </p>
             </div>

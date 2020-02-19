@@ -20,38 +20,48 @@
             :label="item.coursename" 
             :name="'name'+item.id">
 
-            <div class="sh-exam-item">
-              <el-row :gutter="20">
-                <el-col :span="12" v-for="clist in CourseList" :key="clist.id">
-                  <div class="sh-exam-item-box">
-                    <div class="grid-content bg-purple">
-                      <img v-if="!clist.logo_url" src="../assets/img/exam-default.jpg" alt="">
-                      <img v-if="clist.logo_url" :src="clist.logo_url" :alt="clist.coursename">
-                    </div>
-                    <div class="info">
-                      <!-- tit-v  tit-p tit-w -->
-                      <div class="tit ">{{clist.examinationname}}</div>
-                      <div class="desc">授课老师：杨华</div>
-                      <div class="num">
-                        <span>得分：{{clist.points ? clist.points : 0}}</span>
-                        <span>试题量：{{clist.questionscount}}道</span>
-                      </div>
-                      <div class="link">
-                        <router-link v-if="clist.examstate != '已考试'" class="btn btn-hover" 
-                          :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,'currentPageName': clist.examinationname}}" target="_blank">
-                          <span v-if="clist.examstate == '未考试'">去考试</span>    
-                          <span v-if="clist.examstate == '考试中'">继续考试</span>    
-                        </router-link>
-                        <router-link v-if="clist.examstate == '已考试'" class="btn btn-hover" 
-                          :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,pageuse:'see','currentPageName': clist.examinationname}}" target="_blank">
-                          <span v-if="clist.examstate == '已考试'">考题查看</span>    
-                        </router-link>
-                      </div>
-                    </div>
+            <!-- 视频 -->
+            <div class="sh-video-tab">
+              <el-tabs v-model="currentPeriodid" @tab-click="handelGetCourseList">
+                <el-tab-pane v-for="examItem in PeriodList"  :key="examItem.id" :label="examItem.periodname" :name="'periodid'+examItem.id">
+                  <!-- 考试item -->
+                  <div class="sh-exam-item">
+                    <el-row :gutter="20">
+                      <el-col :span="12" v-for="clist in CourseList" :key="clist.id">
+                        <div class="sh-exam-item-box">
+                          <div class="grid-content bg-purple">
+                            <img v-if="!clist.logo_url" src="../assets/img/exam-default.jpg" alt="">
+                            <img v-if="clist.logo_url" :src="clist.logo_url" :alt="clist.coursename">
+                          </div>
+                          <div class="info">
+                            <!-- tit-v  tit-p tit-w -->
+                            <div class="tit ">{{clist.examinationname}}</div>
+                            <div class="desc">授课老师：杨华</div>
+                            <div class="num">
+                              <span>得分：{{clist.points ? clist.points : 0}}</span>
+                              <span>试题量：{{clist.questionscount}}道</span>
+                            </div>
+                            <div class="link">
+                              <router-link v-if="clist.examstate != '已考试'" class="btn btn-hover" 
+                                :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,'currentPageName': clist.examinationname}}" target="_blank">
+                                <span v-if="clist.examstate == '未考试'">去考试</span>    
+                                <span v-if="clist.examstate == '考试中'">继续考试</span>    
+                              </router-link>
+                              <router-link v-if="clist.examstate == '已考试'" class="btn btn-hover" 
+                                :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,pageuse:'see','currentPageName': clist.examinationname}}" target="_blank">
+                                <span v-if="clist.examstate == '已考试'">考题查看</span>    
+                              </router-link>
+                            </div>
+                          </div>
+                        </div>
+                      </el-col>
+                    </el-row>
                   </div>
-                </el-col>
-              </el-row>
+                </el-tab-pane>
+              </el-tabs>
             </div>
+
+
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -66,12 +76,17 @@ export default {
   data() {
     return {
       activeNavName: 'name1',
-      activeVideoType: 'activeVideoType0',
+      // activeVideoType: 'activeVideoType0',
       menuid: null,
       BannerList:[],
+      // 课程列表
       CourseList: [],
       MajorList: [],
-      CurrentUserId: this.GLOBAL.CurrentUserId
+      // 学期列表
+      PeriodList:[],
+      marjorId:null,
+      CurrentUserId: this.GLOBAL.CurrentUserId,
+      currentPeriodid:null
     }
   },
   mounted(){
@@ -83,14 +98,19 @@ export default {
   components: {
   },
   methods: {
-    handleClick(tab, event) {
+    // 学期点击事件
+    handelGetCourseList(tab, event){
       console.log(tab, event);
+      // 获取学期下的列表
+      this.GetCourseList(this.marjorId, this.PeriodList[tab.index].id)
     },
     // 切换专业选项卡
     changeCourse(tab, event) {
       // console.log('tab', tab);
       // console.log('event', event);
-      this.GetCourseList(this.MajorList[tab.index].id)
+      // 获取课程下的学期列表
+      this.marjorId = this.MajorList[tab.index].id
+      this.GetPeriodList(this.MajorList[tab.index].id)
     },
     GetBanner(){
       this.$http.get('/API/Advertisement.ashx?command=GetBanner').then(function (res) {
@@ -99,12 +119,12 @@ export default {
       })
     },
     // 课程列表
-    GetCourseList(courseid){
+    GetCourseList(courseid,periodid){
       if(!courseid) return;
-      this.$http.get('/API/Exam/ExaminationPaper.ashx?command=GetExaminationsByCourseId&majorid=' + this.GLOBAL.MajorId +'&courseid='+courseid+'&userid='+this.GLOBAL.CurrentUserId
+      this.$http.get('/API/Exam/ExaminationPaper.ashx?command=GetExaminationsByCourseId&majorid=' + this.GLOBAL.MajorId +'&courseid='+courseid+'&periodid='+periodid+'&userid='+this.GLOBAL.CurrentUserId
 ).then(function (res) {
         this.CourseList = res.body.dataList
-        this.activeVideoType = 'activeVideoType0'
+        // this.activeVideoType = 'activeVideoType0'
         //  console.info('this.CourseList', this.CourseList)
       })
     },
@@ -114,9 +134,22 @@ export default {
         this.MajorList = res.body.dataList
         if(this.MajorList[0].id){
           this.activeNavName = 'name'+this.MajorList[0].id
-          this.GetCourseList(this.MajorList[0].id)
+
+          // 获取学期列表
+          this.marjorId = this.MajorList[0].id
+          this.GetPeriodList(this.MajorList[0].id)
         }
-        // console.info('this.MajorList', this.MajorList[0].majorname)
+      })
+    },
+    // 学期列表
+    GetPeriodList(courseid){
+      this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid=' + courseid  +'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        this.PeriodList = res.body.dataList
+        this.currentPeriodid = 'periodid'+this.PeriodList[0].id
+        console.info('this.currentPeriodid', this.currentPeriodid)
+
+        // 获取课程列表
+        this.GetCourseList(courseid, this.PeriodList[0].id)
       })
     }
   }
@@ -144,42 +177,7 @@ export default {
       background-color: #d3dce6;
     }
   }
-
-  // menu菜单
-  .sh-menu{
-    // height: 60px;
-    // overflow: hidden;
-    margin: 60px 0;
-    // line-height: 60px;
-    // background: #ffffff;
-    border-radius: 10px;
-    .el-tabs__header{
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow:5px 5px 5px rgba(0,0,0,.15);
-    }
-    .el-tabs__item{
-      height: 60px;
-      line-height: 60px;
-      border: none!important;
-      font-size: 24px;
-      background: #ffffff;
-      &:hover{
-        color: #3333ff;
-      }
-    }
-    .el-tabs--card > .el-tabs__header .el-tabs__nav{
-      border: none;
-    }
-    .el-tabs--card > .el-tabs__header .el-tabs__item.is-active{
-      background: #3333ff;
-      color: #ffffff;
-    }
-    .el-tabs__nav-next, .el-tabs__nav-prev{
-      line-height: 60px;
-      z-index: 9999;
-    }
-  }
+  
 }
 
 .sh-exam-item{
