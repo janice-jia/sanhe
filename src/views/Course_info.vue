@@ -114,7 +114,8 @@ export default {
       // 进度
       Shedule:{},
       exampoints:'',
-      studypoints:''
+      studypoints:'',
+      currentTab:{index:0}
     }
   },
   mounted(){
@@ -164,6 +165,10 @@ export default {
     },
     // 课件列表  periodid(学期id)
     GetCourseWare(tab){
+      // 当前选中的学期对象
+      this.currentTab = tab
+      console.info('this.currentTab',  this.currentTab)
+
       let periodid = this.CoursePeriod[tab.index].id
       this.periodid = periodid
       let THIS = this
@@ -256,6 +261,7 @@ export default {
       }
       
     },
+    // 设置课件学习进度
     SetCourseWareStudySchedule(done){
       clearInterval(this.timer);
       console.info('this.actuallytime', this.actuallytime)
@@ -265,10 +271,15 @@ export default {
       }
       let actuallytime = parseInt(this.actuallytime / 60)
       if(actuallytime < 1) actuallytime = 1
-      console.info('this.selectVideoItem', this.selectVideoItem)
-      console.info('actuallytime', actuallytime)
+      // console.info('this.selectVideoItem', this.selectVideoItem)
+      // console.info('actuallytime', actuallytime)
+      let _this = this
       this.$http.get('/API/Study/CourseWare.ashx?command=SetCourseWareStudySchedule&userid='+this.GLOBAL.CurrentUserId+'&coursewareid='+this.selectVideoItem.id+'&totaltime='+this.selectVideoItem.totaltime+'&actuallytime='+actuallytime).then(function (res) {
         console.info('res.body', res.body)
+        if(res.body.state == 'success'){
+          // 更新当前详情
+          _this.GetCourseWare(_this.currentTab)
+        }
       })
       if(done()) done();
     }
