@@ -29,7 +29,7 @@
                   <div class="sh-video">
                     <el-row :gutter="20">
                       <el-col :span="6" v-for="clist in citem.children" :key="clist.id">
-                        <router-link :to="{name:'courseInfo', params: {courseid: clist.id}}" target="_blank">
+                        <router-link :to="{name:'courseInfo', params: {courseid: clist.id}, query: {majorid: item.id}}" target="_blank">
                           <div class="grid-content bg-purple">
                             <img :src="clist.logo_url" :alt="clist.coursename">
                           </div>

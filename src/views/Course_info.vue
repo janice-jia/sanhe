@@ -29,13 +29,14 @@
             <el-row>
               <!-- <el-col :span="8">授课老师：</el-col> -->
               <!-- <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col> -->
-              <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }}分</el-col>
-              <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}}分</el-col>
+              <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }} 分</el-col>
+              <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}} 分</el-col>
+              <el-col :span="8">学习总时长: {{studytimes ? studytimes : '0'}} 分钟</el-col>
             </el-row>
           </div>
           <div class="progress">
             <div class="progress-box"><el-progress :percentage="Shedule.percentage"></el-progress></div>
-            <div class="progress-txt">已完成：{{Shedule.complete}} / {{Shedule.coursewarecount}}课时</div>
+            <div class="progress-txt">已完成：{{Shedule.complete}} / {{Shedule.coursewarecount}}学时</div>
           </div>
           <div class="start">
             <!-- <a href="#" class="btn btn-hover">继续学习</a> -->
@@ -55,9 +56,9 @@
                 <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
                   <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
                   <div class="sh-class-item-r">
-                    <span style="font-size:16px;margin-right:70px;color:#999999">{{ware.schedule}}</span>
-                    <span style="font-size:16px;" v-if="ware.totaltime">{{ware.totaltime}}分钟</span>
-                    <span style="font-size:16px;" v-if="!ware.totaltime">0分钟</span>
+                    <span style="font-size:16px;margin-right:0px;color:#999999">{{ware.schedule}}</span>
+                    <!-- <span style="font-size:16px;" v-if="ware.totaltime">{{ware.totaltime}}分钟</span>
+                    <span style="font-size:16px;" v-if="!ware.totaltime">0分钟</span> -->
                   </div>
                 </div>
                 <!-- <div class="sh-class-item">
@@ -115,7 +116,10 @@ export default {
       Shedule:{},
       exampoints:'',
       studypoints:'',
-      currentTab:{index:0}
+      currentTab:{index:0},
+      // GetCourseStudyTimes
+      // 学习总分数
+      studytimes: 0
     }
   },
   mounted(){
@@ -173,7 +177,7 @@ export default {
       this.periodid = periodid
       let THIS = this
       // console.info('periodid', periodid)
-      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
+      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&majorid=' + this.$route.query.majorid + '&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
         this.CourseWare = res.body.dataList || []
 
         setTimeout(function(){
@@ -195,13 +199,22 @@ export default {
         this.GetExaminationPoints(periodid)
       })
     },
+    GetCoursePeriodByCourseId(){
+      this.$http.get('/API/Study/Course.ashx?command=GetCourseStudyTimes&courseid='+this.$route.params.courseid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+        // 总学时
+        this.studytimes = res.body.studytimes
+      })
+    },
     // 学期列表
     GetCoursePeriod(){
       this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid='+this.$route.params.courseid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
         this.CoursePeriod = res.body.dataList || []
         if(this.CoursePeriod && this.CoursePeriod.length > 0) {
           this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
+          // 课件列表  periodid(学期id)
           this.GetCourseWare({index:0})
+          // 学习总时长
+          this.GetCoursePeriodByCourseId();
           this.periodid = this.CoursePeriod[0].id
         }
         console.info('this.CoursePeriod',this.CoursePeriod)
