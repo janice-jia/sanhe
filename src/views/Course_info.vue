@@ -181,7 +181,7 @@ export default {
         this.CourseWare = res.body.dataList || []
 
         setTimeout(function(){
-          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
+          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&majorid=' + this.$route.query.majorid + '&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
             THIS.Shedule = res.body[0]
             if(THIS.Shedule.complete == 0 ){
               THIS.Shedule.percentage = 0
