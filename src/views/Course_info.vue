@@ -177,11 +177,11 @@ export default {
       this.periodid = periodid
       let THIS = this
       // console.info('periodid', periodid)
-      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&majorid=' + this.$route.query.majorid + '&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
+      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&majorid=' + THIS.$route.query.majorid + '&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
         this.CourseWare = res.body.dataList || []
 
         setTimeout(function(){
-          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&majorid=' + this.$route.query.majorid + '&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
+          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&majorid=' + THIS.$route.query.majorid + '&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
             THIS.Shedule = res.body[0]
             if(THIS.Shedule.complete == 0 ){
               THIS.Shedule.percentage = 0
