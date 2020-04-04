@@ -141,7 +141,7 @@ export default {
     },
     // 获取学习分数
     GetCourseStudyPoints(){
-      this.$http.get('/API/Study/Course.ashx?command=GetCourseStudyPoints&courseid='+this.CourseInfo.id+'&periodid='+this.periodid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+      this.$http.get('/API/Study/Course.ashx?command=GetCourseStudyPoints&majorid=' + this.$route.query.majorid + '&courseid='+this.CourseInfo.id+'&periodid='+this.periodid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         console.info('res.body.studypoints===', res.body.studypoints)
         this.studypoints = res.body.studypoints
