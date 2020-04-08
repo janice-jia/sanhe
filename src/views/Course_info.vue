@@ -54,7 +54,7 @@
               <!-- 第一学期 -->
               <div class="sh-semester-class">
                 <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
-                  <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
+                  <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', pdf:ware.filetype == 'PDF', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
                   <div class="sh-class-item-r">
                     <span style="font-size:16px;margin-right:0px;color:#999999">{{ware.schedule}}</span>
                     <!-- <span style="font-size:16px;" v-if="ware.totaltime">{{ware.totaltime}}分钟</span>
@@ -457,6 +457,11 @@ export default {
               background: url(../assets/img/tit-p.png) no-repeat!important;
             }
           }
+          .pdf{
+            &::before{
+              background: url(../assets/img/tit-p.png) no-repeat!important;
+            }
+          }
           .word{
             &::before{
               background: url(../assets/img/tit-w.png) no-repeat!important;
@@ -485,6 +490,11 @@ export default {
         .ppt{
           &::before{
             background: url(../assets/img/tit-p-default.png) no-repeat!important;
+          }
+        }
+        .pdf{
+          &::before{
+            background: url(../assets/img/tit-pdf-default.png) no-repeat!important;
           }
         }
         .word{

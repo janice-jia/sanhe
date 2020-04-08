@@ -103,3 +103,23 @@ li{
     height: 92%;
     min-height: 92%;
 }
+
+.el-tabs__nav-wrap.is-scrollable{
+    padding: 0 40px;
+}
+.el-tabs__nav-prev{
+    .el-icon-arrow-left:before{
+        line-height: 60px;
+        font-weight: bold;
+        font-size: 30px;
+        color: #3333ff;
+    }
+}
+.el-tabs__nav-next{
+    .el-icon-arrow-right:before{
+        line-height: 60px;
+        font-weight: bold;
+        font-size: 28px;
+        color: #3333ff;
+    }
+}
