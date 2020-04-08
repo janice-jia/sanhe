@@ -459,7 +459,7 @@ export default {
           }
           .pdf{
             &::before{
-              background: url(../assets/img/tit-p.png) no-repeat!important;
+              background: url(../assets/img/tit-pdf.png) no-repeat!important;
             }
           }
           .word{
