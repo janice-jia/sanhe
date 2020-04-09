@@ -243,8 +243,13 @@ export default {
         });
       }else if(ware.filetype == 'PDF'){
         this.dialogTableVisible = true
+        let options = {
+          //禁用工具栏代码
+          pdfOpenParams: { scrollbars: '0', toolbar: '0', statusbar: '0' }       
+        }; 
+
         setTimeout(function(){
-          pdf.embed(ware.fileurl, "#video");  
+          pdf.embed(ware.fileurl, "#video", options);  
         }, 300)
       } else {
         // 视频

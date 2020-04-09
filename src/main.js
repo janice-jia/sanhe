@@ -14,9 +14,9 @@ Vue.use(VueDirectiveImagePreviewer)
 Vue.use(VueCookies) 
 
 // 测试---设置cookie
-// Vue.$cookies.set("CurrentUserId","3773")
-// Vue.$cookies.set("CurrentUserName","131028200111240035")
-// Vue.$cookies.set("MajorId","20")
+Vue.$cookies.set("CurrentUserId","3773")
+Vue.$cookies.set("CurrentUserName","131028200111240035")
+Vue.$cookies.set("MajorId","20")
 
 let CurrentUserId = Vue.$cookies.get('CurrentUserId')
 let CurrentUserName = Vue.$cookies.get('CurrentUserName')
