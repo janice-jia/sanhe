@@ -100,10 +100,19 @@ li{
 .el-dialog__body{
     max-height: 100%!important;
     margin-top: 0!important;
-    height: 92%;
-    min-height: 92%;
+    height: 100%;
+    min-height: 100%;
+    padding-top: 10px;
 }
-
+.el-dialog__headerbtn{
+    top: 5px;
+    right: 10px;
+}
+.el-dialog__headerbtn .el-dialog__close{
+    font-weight: bold;
+    font-size: 30px;
+    color: #000000;
+}
 .el-tabs__nav-wrap.is-scrollable{
     padding: 0 40px;
 }
@@ -121,5 +130,13 @@ li{
         font-weight: bold;
         font-size: 28px;
         color: #3333ff;
+    }
+}
+
+#mainContainer{
+    .pdfobject-container{
+        .toolbar,#toolbarViewer{
+            display: none!important;
+        }
     }
 }

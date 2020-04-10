@@ -83,8 +83,16 @@
       </div>      
     </div>
 
-    <el-dialog width="90%" top="5vh" custom-class="video" style="height:96%;margin-top:0!important;" :before-close="SetCourseWareStudySchedule" :visible.sync="dialogTableVisible" :destroy-on-close="true">
-      <div id="video" :style="{height: clientHeight - 200 + 'px'}"></div>
+    <el-dialog 
+      width="100%" 
+      height="100%"
+      top="0vh" 
+      custom-class="video" 
+      style="height:100%;margin-top:0!important;" 
+      :before-close="SetCourseWareStudySchedule" 
+      :visible.sync="dialogTableVisible" 
+      :destroy-on-close="true">
+      <div id="video" :style="{height: clientHeight + 'px'}"></div>
     </el-dialog>
   </div>
 </template>
@@ -245,7 +253,14 @@ export default {
         this.dialogTableVisible = true
         let options = {
           //禁用工具栏代码
-          pdfOpenParams: { scrollbars: '0', toolbar: '0', statusbar: '0' }       
+          pdfOpenParams: { 
+            zoom: '120',
+            scrollbars: 0, 
+            toolbar: 0, 
+            statusbar: '0'
+          },  
+          width: "100%",
+          height: "100%"   
         }; 
 
         setTimeout(function(){
@@ -519,16 +534,16 @@ export default {
 
 // 弹窗
 .el-message-box{
-  width: 92%!important;
+  width: 100%!important;
   // max-width: 1200px;
-  min-height:92%;
+  min-height:100%;
 }
 
 .el-dialog{
-  width: 92%!important;
+  width: 100%!important;
   // max-width: 1200px;
-  min-height:92%;
-  max-width: 95%;
+  min-height: 100%;
+  max-width: 100%;
 }
 #video{
   height: 100%;
