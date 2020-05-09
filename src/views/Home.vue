@@ -6,19 +6,20 @@
         <el-carousel trigger="click" height="400px">
           <el-carousel-item v-for="item in BannerList" :interval="5000" :key="item.id">
             <!-- <h3>{{ item }}</h3> -->
-            <img :src="item.imgurl" :alt="item.bannername">
+            <img :src="GLOBAL.webUrl+item.imgUrl" :alt="item.bannername">
           </el-carousel-item>
         </el-carousel>
       </div>
       
       <!-- 导航 -->
+      <div class="sh-hot">热门课程</div>
       <div class="sh-menu">
         <el-tabs v-model="activeNavName" type="card" @tab-click="changeCourse">
           <el-tab-pane 
             v-for="item in MajorList" 
-            :key="item.id" 
-            :label="item.majorname" 
-            :name="'name'+item.id">
+            :key="item.majorId" 
+            :label="item.name" 
+            :name="'name'+item.majorId">
 
             <!-- 视频 -->
             <div class="sh-video-tab">
@@ -28,15 +29,26 @@
                   <!-- 视频 -->
                   <div class="sh-video">
                     <el-row :gutter="20">
-                      <el-col :span="6" v-for="clist in citem.children" :key="clist.id">
-                        <router-link :to="{name:'courseInfo', params: {courseid: clist.id}, query: {majorid: item.id}}" target="_blank">
+                      <el-col :xs="12" :sm="12" :lg="{span: '4-8'}"  v-for="clist in citem.children" :key="clist.id">
+                        <router-link :to="{name:'courseInfo', params: {courseid: clist.courseId}, query: {majorId: clist.majorId}}" target="_blank">
                           <div class="grid-content bg-purple">
-                            <img :src="clist.logo_url" :alt="clist.coursename">
+                            <!-- <img :src="GLOBAL.webUrl+clist.logoUrl" :alt="clist.logoUrl"> -->
+                            <el-image
+                              style="width: 220px; height: 220px"
+                              :src="GLOBAL.webUrl+clist.logoUrl"
+                              fit="none"></el-image>
                           </div>
                           <!-- tit-v  tit-p tit-w -->
-                          <div class="tit ">{{clist.coursename}}</div>
-                          <!-- <div class="desc">授课老师：杨华</div> -->
+                          <div class="tit">{{clist.courseName}}</div>
+                          <div class="type">授课类型：{{clist.courseType}}</div>
+                          <!-- <div class="teacher">授课老师：{{clist.teacherName}}</div> -->
                         </router-link>
+                        <div class="btn">
+                          <button v-if="clist.isSignUp == 1" @click="changeSignUp(clist)">定制</button>
+                          <button v-if="clist.isSignUp == 0" @click="changeSignUp(clist)" class="gray">已定制</button>
+                        </div>
+                        <!-- <div class="desc">授课老师：杨华</div> -->
+                        
                       </el-col>
                     </el-row>
                   </div>
@@ -44,6 +56,91 @@
               </el-tabs>
             </div>
           </el-tab-pane>
+        </el-tabs>
+      </div>
+      
+      <!-- 排行榜 -->
+      <div class="sh-hot">排行榜</div>
+      <div class="sh-video-tab rankList">
+        <el-tabs v-model="activeHotName" @tab-click="handleClick">
+          <!-- 学习时长排名   start -->
+          <el-tab-pane label="学习时长排名" name="first">
+            <el-row>
+              <el-col :span="12">
+                <!-- 昨日 -->
+                <p class="tit"><span class="blue">今日学习时长排行榜</span><span>（仅展示部分排名靠前学生）</span></p>
+                <table style="width:80%" class="rankTable">
+                  <colgroup>
+                    <col style="width:30%">
+                    <col style="width:12%">
+                    <col style="width:38%">
+                    <col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <th align="left">排名数值</th>
+                    <th></th>
+                    <th align="left">昵称</th>
+                    <th align="right">学习时长</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, i) in todayList" :key="i">
+                      <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
+                        <span v-if="i > 2">{{i}}</span>  
+                      </td>
+                      <td>
+                        <el-avatar size="large" src="circleUrl">
+                          {{item.studentName}}
+                        </el-avatar>
+                      </td>
+                      <td>
+                        <p>{{item.studentName}}</p>
+                      </td>
+                      <td align="right">{{item.totalTime}} 分钟</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="nullCon" v-if="!todayList || todayList.length == 0">暂无数据</p>
+              </el-col>
+              <el-col :span="12">
+                <p class="tit">昨日学习时长排行榜<span>（仅展示部分排名靠前学生）</span></p>
+                <table style="width:80%" class="rankTable">
+                  <colgroup>
+                    <col style="width:30%">
+                    <col style="width:12%">
+                    <col style="width:38%">
+                    <col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <th align="left">排名数值</th>
+                    <th></th>
+                    <th align="left">昵称</th>
+                    <th align="right">学习时长</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, i) in yestodayList" :key="i">
+                      <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
+                        <span v-if="i > 2">{{i}}</span>  
+                      </td>
+                      <td>
+                        <el-avatar size="large" src="circleUrl">
+                          {{item.studentName}}
+                        </el-avatar>
+                      </td>
+                      <td>
+                        <p>{{item.studentName}}</p>
+                      </td>
+                      <td align="right">{{item.totalTime}} 分钟</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="nullCon" v-if="!yestodayList || yestodayList.length == 0">暂无数据</p>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <!-- 学习时长排名   end -->
+          <el-tab-pane label="活跃度排名" name="second">活跃度排名</el-tab-pane>
+          <el-tab-pane label="课件点击率排名" name="third">课件点击率排名</el-tab-pane>
+          <el-tab-pane label="最受欢迎课程排名" name="fourth">最受欢迎课程排名</el-tab-pane>
         </el-tabs>
       </div>
       
@@ -58,10 +155,19 @@ export default {
     return {
       activeNavName: 'name1',
       activeVideoType: 'activeVideoType0',
+      activeHotName:'first',
       menuid: null,
       BannerList:[],
       CourseList: [],
-      MajorList: []
+      MajorList: [],
+      // 今日学习时长
+      todayList:[],
+      // 昨日学习时长
+      yestodayList: [],
+      // 活跃度排名
+      activityList: [],
+      // 受欢迎的课件
+      coursePopularList:[]
     }
   },
   mounted(){
@@ -69,6 +175,12 @@ export default {
     this.GetBanner()
     // 课程列表
     this.GetMajorList()
+    // 学习时长
+    this.getStudyTimeList()
+    // 活跃度排名
+    this.getActivityList()
+    // 收欢迎的课件
+    this.getCoursePopularList()
   },
   components: {
   },
@@ -80,36 +192,80 @@ export default {
     changeCourse(tab, event) {
       // console.log('tab', tab);
       // console.log('event', event);
-      this.GetCourseList(this.MajorList[tab.index].id)
+      this.GetCourseList(this.MajorList[tab.index].majorId)
     },
     GetBanner(){
-      this.$http.get('/API/Advertisement.ashx?command=GetBanner').then(function (res) {
+      this.$http.post('/api/index/bannerList').then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
-        this.BannerList = res.body.dataList || []
+        this.BannerList = res.body.data || []
         // console.info('this.BannerList', this.BannerList)
       })
     },
     // 课程列表
     GetCourseList(menuid){
       if(!menuid) return;
-      this.$http.get('/API/Index.ashx?command=GetCourseListByMajorId&majorid=' + menuid).then(function (res) {
-        // res.body = this.formatterNavVal(res.body, 'shipcompany')
-        this.CourseList = res.body.dataList
+      this.$http.post('/api/index/courseList', {
+        'majorId': menuid,
+        'studentId': this.GLOBAL.studentId
+      }).then(function (res) {
+        this.CourseList = res.body.data.rows
         // console.info('this.CourseList', res.body)
-        if(this.CourseList && this.CourseList.length > 0) this.CourseList = this.formatterTagType(this.CourseList, 'coursetype')
+        if(this.CourseList && this.CourseList.length > 0) {
+          this.CourseList = this.formatterTagType(this.CourseList, 'courseType')
+        }
         this.activeVideoType = 'activeVideoType0'
         //  console.info('this.CourseList', this.CourseList)
       })
     },
+    // 定制
+    changeSignUp(info){
+      if(!this.GLOBAL.studentId){
+        this.$message.error('请登录后定制课程！');
+        return false
+      }
+      info.isSignUp = 0
+      this.$http.post('/api/course/customized',{
+        "courseId": info.courseId,
+        "majorId": info.majorId,
+        "studentId": this.GLOBAL.studentId
+      }).then(function (res) {
+        // console.info('res', res)
+        if(res.status == 200){
+          this.$message.success('定制成功');
+        }else{
+          this.$message.error(res.data.msg || '定制失败');
+          info.isSignUp = 1
+        }
+      })
+    },
     // 专业列表
     GetMajorList(){
-      this.$http.get('/API/Index.ashx?command=GetMajorList').then(function (res) {
-        this.MajorList = res.body.dataList
-        if(this.MajorList[0].id){
-          this.activeNavName = 'name'+this.MajorList[0].id
-          this.GetCourseList(this.MajorList[0].id)
+      this.$http.post('/api/index/majorList').then(function (res) {
+        this.MajorList = res.body.data
+        if(this.MajorList && this.MajorList[0].majorId){
+          this.activeNavName = 'name'+this.MajorList[0].majorId
+          this.GetCourseList(this.MajorList[0].majorId)
         }
         // console.info('this.MajorList', this.MajorList[0].majorname)
+      })
+    },
+    // 获取学习时长
+    getStudyTimeList(){
+      this.$http.post('/api/index/courseWareStudyTimeList').then(function (res) {
+        this.todayList = res.body.data.todayList
+        this.yestodayList = res.body.data.yestodayList
+      })
+    },
+    // 活跃度
+    getActivityList(){
+      this.$http.post('/api/index/activityList').then(function (res) {
+        this.activityList = res.body.data
+      })
+    },
+    // 收欢迎的课件
+    getCoursePopularList(){
+      this.$http.post('/api/index/coursePopularList').then(function (res) {
+        this.coursePopularList = res.body.data
       })
     },
     // 格式化分类类型二维数组
@@ -175,18 +331,20 @@ export default {
       background-color: #d3dce6;
     }
   }
-
-
-  
-
-
-  
 }
+.sh-hot{
+  padding: 30px 0;
+  font-size:24px;
+  font-family:Microsoft YaHei;
+  font-weight:400;
+  color:rgba(51,51,51,1);
+}
+
 // menu菜单
 .sh-menu{
   // height: 60px;
   // overflow: hidden;
-  margin: 60px 0;
+  // margin: 60px 0;
   // line-height: 60px;
   // background: #ffffff;
   border-radius: 10px;
@@ -273,7 +431,7 @@ export default {
     }
     .grid-content {
       border-radius: 4px;
-      height: 214px;
+      height: 220px;
     }
     .row-bg {
       padding: 10px 0;
@@ -283,16 +441,43 @@ export default {
       height: 40px;
       line-height: 40px;
       font-size: 18px;
-      color: #333333;
+      color:rgba(51,51,255,1);
       background: #ffffff;
       overflow: hidden;
       padding: 0 30px 0 10px;
       a{
-        color: #333333;
+        color:rgba(51,51,255,1);
         display: inline-block;
       }
       &:hover{
         color: #3333ff;
+      }
+    }
+    .type,.teacher{
+      background: #ffffff;
+      font-size:12px;
+      font-weight:400;
+      color:rgba(102,102,102,1);
+      padding: 0 10px;
+      line-height: 22px;
+    }
+    .btn{
+      background: #ffffff;
+      width: 100%;
+      height: 50px;
+      padding: 0 10px 0 10px;
+      button{
+        width:60px;
+        height:25px;
+        border: none;
+        background:rgba(241,0,0,1);
+        border-radius:5px;
+        color: #ffffff;
+        font-size: 12px;
+        cursor: pointer;
+        &.gray{
+          background:rgba(153,153,153,1);
+        }
       }
     }
     .tit-v,.tit-p,.tit-w{
@@ -330,6 +515,59 @@ export default {
       background: #ffffff;
       overflow: hidden;
       padding: 0 10px;
+    }
+  }
+  .el-col-lg-4-8 {
+		width: 20%;
+	}
+}
+
+.rankList{
+  .tit{
+    font-size:22px;
+    font-weight:400;
+    color: #333333;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    span{
+      font-size: 14px;
+      &.blue{
+        color:rgba(51,51,255,1);
+        font-size: 22px;
+      }
+    }
+  }
+
+  .nullCon{
+    padding: 30px 0;
+    font-size: 20px;
+    color: #666666;
+  }
+  .rankTable{
+    td{
+      padding: 12px 0;
+    }
+    th,td{
+      font-size:16px;
+      font-weight:400;
+      color:rgba(51,51,51,1);
+      &.first{
+        background: url(../assets/img/1.png) no-repeat 17px center;
+      }
+      &.second{
+        background: url(../assets/img/2.png) no-repeat 17px center;
+      }
+      &.third{
+        background: url(../assets/img/3.png) no-repeat 17px center;
+      }
+      &.pl17{
+        padding-left: 17px;
+        span{
+          display: inline-block;
+          width: 30px;
+          text-align: center;
+        }
+      }
     }
   }
 }

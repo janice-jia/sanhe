@@ -5,33 +5,36 @@
       <div class="sh-crumbs">
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item to="home">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>{{CourseInfo.coursetype}}</el-breadcrumb-item>
-          <el-breadcrumb-item>{{CourseInfo.coursename}}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{CourseInfo.courseType}}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{CourseInfo.courseName}}</el-breadcrumb-item>
           <el-breadcrumb-item>详情</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
 
       <div class="sh-classinfo-01">
         <div class="sh-classinfo-01-l">
-          <img :src="CourseInfo.logo_url" alt="">
+          <!-- <img :src="GLOBAL.webUrl+CourseInfo.logoUrl" alt=""> -->
+          <el-image
+            style="width: 400px; height: 400px"
+            :src="GLOBAL.webUrl+CourseInfo.logoUrl"
+            :fit="none"></el-image>
         </div> 
         <div class="sh-classinfo-01-r">
-          <div class="tit">{{CourseInfo.coursename}}</div>
+          <div class="tit">{{CourseInfo.courseName}}</div>
           <div class="desc-info">
             <el-row>
-              <!-- <el-col :span="8">授课老师：</el-col> -->
-              <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col>
-              <!-- <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }}分</el-col>
-              <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}}分</el-col> -->
+              <el-col :span="6">授课老师：{{CourseInfo.teacherName}}</el-col>
+              <el-col :span="7">教程程度：{{CourseInfo.courseType}}</el-col>
+              <el-col :span="5">所需基础：入门</el-col>
+              <el-col :span="4">课时: {{CourseInfo.totalNum}}课时</el-col>
             </el-row>
           </div>
           <div class="desc-info">
             <el-row>
-              <!-- <el-col :span="8">授课老师：</el-col> -->
-              <!-- <el-col :span="8">课程归类：{{CourseInfo.coursetype}}</el-col> -->
-              <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }} 分</el-col>
+              <el-col :span="8">课程归类：{{CourseInfo.courseType}}</el-col>
+              <!-- <el-col :span="8">学习分数：{{studypoints ? studypoints: '0' }} 分</el-col>
               <el-col :span="8">考试分数: {{exampoints ? exampoints : '0'}} 分</el-col>
-              <el-col :span="8">学习总时长: {{studytimes ? studytimes : '0'}} 分钟</el-col>
+              <el-col :span="8">学习总时长: {{studytimes ? studytimes : '0'}} 分钟</el-col> -->
             </el-row>
           </div>
           <div class="progress">
@@ -40,7 +43,7 @@
           </div>
           <div class="start">
             <!-- <a href="#" class="btn btn-hover">继续学习</a> -->
-            <span class="btn btn-hover">继续学习</span>
+            <span class="btn btn-hover">去考试</span>
           </div>
         </div> 
         <div style="clear:both"></div>
@@ -48,9 +51,9 @@
       <!-- 第一学期  第二学期 -->
       <div class="sh-classinfo-02">
         <div class="sh-classinfo-02-l">
-          <p class="null-con" v-if="CoursePeriod.length == 0">暂无内容</p>
+          <p class="null-con" v-if="CourseInfo.periodList.length == 0">暂无内容</p>
           <el-tabs v-model="hoverPeriodname" @tab-click="GetCourseWare">
-            <el-tab-pane v-for="item in CoursePeriod" :key="item.id" :label="item.periodname" :name="'period'+item.id">
+            <el-tab-pane v-for="item in CourseInfo.periodList" :key="item.id" :label="item.periodName" :name="'period'+item.periodId">
               <!-- 第一学期 -->
               <div class="sh-semester-class">
                 <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
@@ -170,7 +173,11 @@ export default {
       // console.info('courseid', courseid)
       if(!courseid) return
       let THIS = this
-      this.$http.get('/API/Study/Course.ashx?command=GetCourseById&courseid='+courseid).then(function (res) {
+      this.$http.post('/api/courseDetail/courseDetail',{
+        "majorId": this.$route.query.majorId,
+        "courseId": courseid,
+        "studentId": this.GLOBAL.studentId
+      }).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseInfo = res.body.data
       })
@@ -325,14 +332,19 @@ export default {
     padding: 20px;
     background: #ffffff;
     .sh-classinfo-01-l{
-      width: 500px;
-      height: 335px;
+      // width: 500px;
+      // height: 335px;
+      width: 400px;
+      height: 400px;
       float: left;
       margin-right: 40px;
       background-color: #d3dce6;
+      img{
+        max-width: 100%;
+      }
     }
     .sh-classinfo-01-r{
-      width: 600px;
+      width: 700px;
       float: left;
       .tit{
         font-size: 32px;
@@ -351,6 +363,7 @@ export default {
       }
       // 进度条
       .progress{
+        margin-top: 60px;
         height: 80px;
         padding: 20px 0 0 0;
         .progress-box{
