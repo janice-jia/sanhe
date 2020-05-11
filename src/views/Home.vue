@@ -6,7 +6,7 @@
         <el-carousel trigger="click" height="400px">
           <el-carousel-item v-for="item in BannerList" :interval="5000" :key="item.id">
             <!-- <h3>{{ item }}</h3> -->
-            <img :src="GLOBAL.webUrl+item.imgUrl" :alt="item.bannername">
+            <img :src="GLOBAL.webUrl+item.logoUrl" :alt="item.bannername">
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -34,7 +34,7 @@
                           <div class="grid-content bg-purple">
                             <!-- <img :src="GLOBAL.webUrl+clist.logoUrl" :alt="clist.logoUrl"> -->
                             <el-image
-                              style="width: 220px; height: 220px"
+                              style="width: 220px; height: 147px"
                               :src="GLOBAL.webUrl+clist.logoUrl"
                               fit="none"></el-image>
                           </div>
@@ -431,7 +431,7 @@ export default {
     }
     .grid-content {
       border-radius: 4px;
-      height: 220px;
+      height: 147px;
     }
     .row-bg {
       padding: 10px 0;
@@ -477,6 +477,9 @@ export default {
         cursor: pointer;
         &.gray{
           background:rgba(153,153,153,1);
+        }
+        &.blue{
+          background:#3333FF;
         }
       }
     }

@@ -37,11 +37,11 @@
         <div class="sh-video">
           <el-row :gutter="20">
             <el-col :xs="12" :sm="12" :lg="{span: '4-8'}"  v-for="clist in CourseList" :key="clist.id">
-              <router-link :to="{name:'courseInfo', params: {courseid: clist.courseId}, query: {majorid: clist.majorId}}" target="_blank">
+              <router-link :to="{name:'courseInfo', params: {courseid: clist.courseId}, query: {majorId: clist.majorId}}" target="_blank">
                 <div class="grid-content bg-purple">
                   <!-- <img :src="GLOBAL.webUrl+clist.logoUrl" :alt="clist.logoUrl"> -->
                   <el-image
-                  style="width: 220px; height: 220px"
+                  style="width: 220px; height: 147px"
                   :src="GLOBAL.webUrl+clist.logoUrl"
                   fit="none"></el-image>
                 </div>

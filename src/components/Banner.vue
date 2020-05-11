@@ -141,7 +141,7 @@
     </div>
     <el-carousel :interval="8000" arrow="always">
         <el-carousel-item v-for="item in bannerList" :key="item.id">
-          <img :src="item.imgurl" alt="">
+          <img :src="GLOBAL.webUrl+item.logoUrl" alt="">
         </el-carousel-item>
       </el-carousel>
     </div>

@@ -36,7 +36,7 @@ export default {
   mounted(){
     let _this = this;
     setTimeout(function(){
-      _this.$router.push({name:'exam'})
+      _this.$router.push({name:'userfinish'})
     },3000)
   },
   components: {

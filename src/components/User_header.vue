@@ -20,7 +20,7 @@
             <li :class="{hover:$route.name == 'userfinish'}"><router-link :to="{name:'userfinish'}">已完成</router-link></li>
             <li :class="{hover:$route.name == 'userexaming'}"><router-link :to="{name:'userexaming'}">考试中</router-link></li>
             <li :class="{hover:$route.name == 'userexamfinish'}"><router-link :to="{name:'userexamfinish'}">已考试</router-link></li>
-            <li :class="{hover:$route.name == 'usermessage'}"><router-link to="usermessage">我的消息</router-link></li>
+            <li :class="{hover:$route.name == 'usermessage'}"><router-link to="usermessage">个人空间</router-link></li>
           </ul>
         </div>
       </div>

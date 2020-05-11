@@ -15,9 +15,9 @@
         <div class="sh-classinfo-01-l">
           <!-- <img :src="GLOBAL.webUrl+CourseInfo.logoUrl" alt=""> -->
           <el-image
-            style="width: 400px; height: 400px"
+            style="width: 400px; height: 268px"
             :src="GLOBAL.webUrl+CourseInfo.logoUrl"
-            :fit="none"></el-image>
+            fit="none"></el-image>
         </div> 
         <div class="sh-classinfo-01-r">
           <div class="tit">{{CourseInfo.courseName}}</div>
@@ -39,11 +39,14 @@
           </div>
           <div class="progress">
             <div class="progress-box"><el-progress :percentage="Shedule.percentage"></el-progress></div>
-            <div class="progress-txt">已完成：{{Shedule.complete}} / {{Shedule.coursewarecount}}学时</div>
+            <div class="progress-txt">已完成：{{Shedule.completeNum}} / {{Shedule.totalNum}}课时</div>
           </div>
           <div class="start">
             <!-- <a href="#" class="btn btn-hover">继续学习</a> -->
-            <span class="btn btn-hover">去考试</span>
+            <!-- <span class="btn btn-hover">去考试</span> -->
+            <router-link :to="{name:'userfinish'}">
+              <span class="btn btn-hover">去考试</span>
+            </router-link>
           </div>
         </div> 
         <div style="clear:both"></div>
@@ -52,16 +55,32 @@
       <div class="sh-classinfo-02">
         <div class="sh-classinfo-02-l">
           <p class="null-con" v-if="CourseInfo.periodList.length == 0">暂无内容</p>
-          <el-tabs v-model="hoverPeriodname" @tab-click="GetCourseWare">
+          <el-tabs v-if="CourseInfo.periodList.length > 0" v-model="hoverPeriodname" @tab-click="GetCourseWare">
             <el-tab-pane v-for="item in CourseInfo.periodList" :key="item.id" :label="item.periodName" :name="'period'+item.periodId">
               <!-- 第一学期 -->
-              <div class="sh-semester-class">
-                <div class="sh-class-item" @click="open(ware)" v-for="ware in CourseWare" :key="ware.id">
-                  <div :class="{'sh-class-item-l':true, video:ware.filetype=='视频', ppt:ware.filetype == 'PPT', pdf:ware.filetype == 'PDF', word:ware.filetype == 'WORD' }">{{ware.filename}}</div>
+              <div class="sh-semester-class" v-if="item.periodId !== 'question' && item.periodId !== 'message'">
+                <div class="sh-class-item" v-for="ware in CourseWare" :key="ware.id">
+                  <div @click="open(ware)" :class="{'sh-class-item-l':true, video:ware.fileType=='视频', ppt:ware.fileType == 'PPT', pdf:ware.fileType == 'PDF', word:ware.fileType == 'WORD' }">{{ware.fileName}}</div>
                   <div class="sh-class-item-r">
-                    <span style="font-size:16px;margin-right:0px;color:#999999">{{ware.schedule}}</span>
-                    <!-- <span style="font-size:16px;" v-if="ware.totaltime">{{ware.totaltime}}分钟</span>
-                    <span style="font-size:16px;" v-if="!ware.totaltime">0分钟</span> -->
+                    <span style="font-size:16px;margin-right:10px;color:#999999">{{ware.schedule}}</span>
+                    <span v-if="ware.schoolworkPaperList && ware.schoolworkPaperList.length > 0" style="font-size:16px;">
+                      <router-link
+                        :to="{
+                          name:'schoolwork', 
+                          params: {schoolworkPaperId: ware.schoolworkPaperList[0].schoolworkPaperId},
+                          query:{
+                            'pageuse': ware.schoolworkPaperList[0].workState,
+                            'fileName': ware.fileName,
+                            'questionscount': ware.questionsCount
+                          }
+                        }">
+                      {{ware.schoolworkPaperList[0].workState == '已作完' ? '查看作业' : ware.schoolworkPaperList[0].workState}}
+                      </router-link>
+                    </span>
+                    <span v-if="!ware.schoolworkPaperList || ware.schoolworkPaperList.length == 0" style="font-size:16px;">
+                      无作业
+                    </span>
+                    <!-- <span style="font-size:16px;" v-if="!ware.totaltime">0分钟</span> -->
                   </div>
                 </div>
                 <!-- <div class="sh-class-item">
@@ -72,6 +91,51 @@
                   <div class="sh-class-item-l">L1:草图编辑</div>
                   <div class="sh-class-item-r">00:00:00</div>
                 </div> -->
+              </div>
+
+              <!-- 答疑解惑 -->
+              <div class="qa-container" v-if="item.periodId == 'question'">
+                <div class="qa-textarea">
+                  <el-input
+                    type="textarea"
+                    placeholder="请输入内容"
+                    v-model="qa.question"
+                    maxlength="100"
+                    show-word-limit
+                  >
+                  </el-input>
+                  <button class="btn btn-hover">提交</button>
+                </div>
+                <div style="clear:both"></div>
+                <div class="qa-list" v-for="(item,index) in qaList" :key="index">
+                  <p>全部问答  {{qaPageConfig.total}}</p>
+                  <div class="qa-item">
+                    <div class="Q">
+                      Q：{{item.contect}}
+                    </div>
+                    <div class="A" v-for="(a, aindex) in item.answerVoList" :key="aindex">
+                      A：{{a.contect}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pagination">
+                  <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    prev-text= "上一页"
+                    next-text= "下一页"
+                    :page-size="qaPageConfig.pageSize"
+                    :current-page="qaPageConfig.pageNum"
+                    @current-change="changePageQA"
+                    :total="qaPageConfig.total">
+                  </el-pagination>
+                </div>
+              </div>
+
+              <!-- 留言评论 -->
+              <div v-if="item.periodId == 'message'">
+                留言评论
               </div>
             </el-tab-pane>
             <!-- <el-tab-pane label="第二学期" name="second">
@@ -109,7 +173,8 @@ export default {
     return {
       hoverPeriodname: 'period',
       CourseInfo: {
-        coursetype: '',
+        courseType: '',
+        periodList: []
       },
       clientHeight: 650,
       // 学期列表
@@ -130,13 +195,23 @@ export default {
       currentTab:{index:0},
       // GetCourseStudyTimes
       // 学习总分数
-      studytimes: 0
+      studytimes: 0,
+
+
+      // 问答相关
+      qaList:[],
+      qa:{
+        question: ''
+      },
+      qaPageConfig:{
+        pageNum: 1,
+        pageSize: 20,
+        total: 0
+      }
     }
   },
   mounted(){
-    //获取学期
-    this.GetCoursePeriod()
-    // console.info('$state', this.$route)
+    // 详细信息及获取学期
     this.GetCourseInfo(this.$route.params.courseid)
     this.getClientHeight()
   },
@@ -180,59 +255,63 @@ export default {
       }).then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.CourseInfo = res.body.data
+
+        // 添加答疑解惑
+        this.CourseInfo.periodList.push({
+          periodId: 'question',
+          periodName: "答疑解惑"
+        })
+        // 留言评论
+        this.CourseInfo.periodList.push({
+          periodId: 'message',
+          periodName: "留言评论"
+        })
+
+
+        // CourseInfo.periodList---学期列表
+        if(this.CourseInfo.periodList && this.CourseInfo.periodList.length > 0) {
+          this.hoverPeriodname = 'period'+this.CourseInfo.periodList[0].periodId
+          // 课件列表  periodid(学期id)
+          THIS.GetCourseWare({index:0})
+          // 学习总时长
+          // this.GetCoursePeriodByCourseId();
+          this.periodid = this.CourseInfo.periodList[0].periodId
+        }
       })
     },
     // 课件列表  periodid(学期id)
     GetCourseWare(tab){
       // 当前选中的学期对象
       this.currentTab = tab
-      console.info('this.currentTab',  this.currentTab)
-
-      let periodid = this.CoursePeriod[tab.index].id
-      this.periodid = periodid
       let THIS = this
-      // console.info('periodid', periodid)
-      this.$http.get('/API/Study/CourseWare.ashx?command=GetCourseWareByCourseId&majorid=' + THIS.$route.query.majorid + '&periodid='+periodid+'&courseid='+this.$route.params.courseid+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
-        this.CourseWare = res.body.dataList || []
 
-        setTimeout(function(){
-          THIS.$http.get('/API/Study/CourseWare.ashx?command=GetSchedule&majorid=' + THIS.$route.query.majorid + '&periodid='+THIS.periodid+'&courseid='+THIS.CourseInfo.id+'&userid='+THIS.GLOBAL.CurrentUserId).then(function (res) {
-            THIS.Shedule = res.body[0]
-            if(THIS.Shedule.complete == 0 ){
-              THIS.Shedule.percentage = 0
-            }else{
-              THIS.Shedule.percentage =  parseInt(THIS.Shedule.complete / THIS.Shedule.coursewarecount * 100) 
-            }
-            // console.info('res.body', res.body)
-          })
-        },300)
+
+      // 课程id
+      let periodId = this.CourseInfo.periodList[tab.index].periodId
+      this.periodid = periodId
+      console.info('this.periodid',  this.periodid)
+      if(this.periodid == 'question'){
+        // 获取问答列表
+        this.getquestionAnswer()
+      }else if(this.periodid == 'message'){
+        // 获取留言列表
+        // /api/questionAnswer/list
+      }else{
+        // 获取课程列表
+        // console.info('periodid', periodid)
+        this.findWareList(periodId)
 
         // 获取学习分数
-        this.GetCourseStudyPoints(periodid)
+        // this.GetCourseStudyPoints(periodid)
 
         // 获取考试成绩
-        this.GetExaminationPoints(periodid)
-      })
+        // this.GetExaminationPoints(periodid)
+      }
     },
     GetCoursePeriodByCourseId(){
       this.$http.get('/API/Study/Course.ashx?command=GetCourseStudyTimes&courseid='+this.$route.params.courseid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
         // 总学时
         this.studytimes = res.body.studytimes
-      })
-    },
-    // 学期列表
-    GetCoursePeriod(){
-      this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid='+this.$route.params.courseid+'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
-        this.CoursePeriod = res.body.dataList || []
-        if(this.CoursePeriod && this.CoursePeriod.length > 0) {
-          this.hoverPeriodname = 'period'+this.CoursePeriod[0].id
-          // 课件列表  periodid(学期id)
-          this.GetCourseWare({index:0})
-          // 学习总时长
-          this.GetCoursePeriodByCourseId();
-          this.periodid = this.CoursePeriod[0].id
-        }
-        console.info('this.CoursePeriod',this.CoursePeriod)
       })
     },
     open(ware){
@@ -301,6 +380,53 @@ export default {
       }
       
     },
+    getquestionAnswer(){
+      // 获取问答列表
+      this.$http.post('/api/questionAnswer/list', {
+        "pageNum": this.qaPageConfig.pageNum,
+        "pageSize": this.qaPageConfig.pageSize,
+        "topicId": this.$route.params.courseid
+      }).then(function(res){
+        console.info('res.data', res.data)
+        this.qaList = res.data.data.rows || []
+        this.qaPageConfig.total = res.data.data.total
+      })
+    },
+    changePageQA(val){
+      // QA分页查询
+      this.pageNum = val
+      this.getquestionAnswer()
+    },
+    findWareList(periodId){
+      // 获取课程列表
+      let THIS = this
+      this.$http.post('/api/courseDetail/findWareList', {
+        'majorId': THIS.$route.query.majorId,
+        'periodId': periodId,
+        'courseId': this.$route.params.courseid,
+        'studentId': THIS.GLOBAL.studentId
+      }).then(function (res) {
+        this.CourseWare = res.body.data || []
+
+        // 查询学习进度
+        setTimeout(function(){
+          THIS.$http.post('/api/courseDetail/getStudySchedule', {
+            'majorId': THIS.$route.query.majorId,
+            // 'periodId': periodId,
+            'courseId': THIS.$route.params.courseid,
+            'studentId': THIS.GLOBAL.studentId
+          }).then(function (res) {
+            THIS.Shedule = res.data.data
+            if(THIS.Shedule.completeNum == 0 ){
+              THIS.Shedule.percentage = 0
+            }else{
+              THIS.Shedule.percentage =  parseInt(THIS.Shedule.completeNum / THIS.Shedule.totalNum * 100) 
+            }
+            // console.info('res.body', res.body)
+          })
+        },300)
+      })
+    },
     // 设置课件学习进度
     SetCourseWareStudySchedule(done){
       clearInterval(this.timer);
@@ -314,7 +440,14 @@ export default {
       // console.info('this.selectVideoItem', this.selectVideoItem)
       // console.info('actuallytime', actuallytime)
       let _this = this
-      this.$http.get('/API/Study/CourseWare.ashx?command=SetCourseWareStudySchedule&userid='+this.GLOBAL.CurrentUserId+'&coursewareid='+this.selectVideoItem.id+'&totaltime='+this.selectVideoItem.totaltime+'&actuallytime='+actuallytime).then(function (res) {
+      this.$http.post('/api/courseDetail/saveStudySchedule', {
+        'actuallyTime': actuallytime,
+        'courseId': this.$route.params.courseid,
+        'majorId': this.$route.query.majorId,
+        'periodId': this.selectVideoItem.periodId,
+        'studentId': this.GLOBAL.studentId,
+        'wareId': this.selectVideoItem.wareId
+      }).then(function (res) {
         console.info('res.body', res.body)
         if(res.body.state == 'success'){
           // 更新当前详情
@@ -335,7 +468,7 @@ export default {
       // width: 500px;
       // height: 335px;
       width: 400px;
-      height: 400px;
+      height: 268px;
       float: left;
       margin-right: 40px;
       background-color: #d3dce6;
@@ -349,23 +482,20 @@ export default {
       .tit{
         font-size: 32px;
         height: 32px;
-        margin: 40px 0 30px 0;
+        margin: 20px 0 30px 0;
         color: #333333;
       }
       .desc-info{
         font-size: 18px;
         color: #666666;
         font-weight: 400;
-        padding-right: 60px;
         .el-col{
           margin-bottom: 20px;
         }
       }
       // 进度条
       .progress{
-        margin-top: 60px;
-        height: 80px;
-        padding: 20px 0 0 0;
+        height: 50px;
         .progress-box{
           width: 306px;
           float: left;
@@ -471,7 +601,6 @@ export default {
         font-size: 18px;
         color: #333333;
         margin: 10px 0;
-        cursor: pointer;
         &:hover{
           background: rgba(51, 51, 255, 0.15);
           color: #2121bc;
@@ -482,7 +611,7 @@ export default {
           }
           .video{
             &::before{
-              background: url(../assets/img/tit-v-default.png) no-repeat!important;
+              background: url(../assets/img/tit-v.png) no-repeat!important;
             }
           }
           .ppt{
@@ -506,6 +635,7 @@ export default {
           float: left;
           position: relative;
           padding: 0 0 0 37px;
+          cursor: pointer;
           &::before{
             content: '';
             width: 18px;
@@ -539,6 +669,11 @@ export default {
           width: 30%;
           float: right;
           text-align: right;
+          span{
+            display: inline-block;
+            width: 4em;
+            cursor: pointer;
+          }
         }
       }
     }
@@ -561,6 +696,38 @@ export default {
 #video{
   height: 100%;
   width: 100%;
+}
+
+// 答疑解惑
+.qa-container{
+  padding: 10px 0 30px 0;
+  .qa-textarea{
+    .el-textarea__inner{
+      min-height: 110px!important;
+    }
+    .btn{
+      float: right;
+      margin-top: 10px;
+    }
+  }
+  .qa-list{
+    margin-top: 10px;
+    .qa-item{
+      margin: 10px 0 5px 0;
+      .Q{
+        font-size:16px;
+        font-weight:bold;
+        color:rgba(51,51,51,1);
+        line-height:30px;
+      }
+      .A{
+        font-size:16px;
+        font-weight:400;
+        color:rgba(102,102,102,1);
+        line-height:30px;
+      }
+    }
+  }
 }
 </style>
 

@@ -6,6 +6,7 @@ import CourseList from './views/CourseList.vue'
 import MyCourseList from './views/MyCourseList.vue'
 import ExamInfo from './views/ExamInfo.vue'
 import ExamQuestion from './views/ExamQuestion.vue'
+import SchoolWork from './views/SchoolWork.vue'
 import ExamSubmit from './views/ExamSubmit.vue'
 import CourseInfo from './views/Course_info.vue'
 import Usermessage from './views/User_message.vue'
@@ -55,9 +56,15 @@ export default new Router({
         },
         // 考试详情页
         {
-            path: '/examQuestion:examinationid',
+            path: '/examQuestion:examId',
             name: 'examQuestion',
             component: ExamQuestion
+        },
+        // 作业详情页
+        {
+            path: '/schoolWork:schoolworkPaperId',
+            name: 'schoolwork',
+            component: SchoolWork
         },
         // 提交结果页面
         {

@@ -10,7 +10,8 @@
           <li :class="{hover:($route.name == 'home' || $route.path == '/')}"><router-link :to="{name:'home'}" target="_blank">首页</router-link></li>
           <li :class="{hover:$route.name == 'courseList'}"><router-link :to="{name:'courseList'}" target="_blank">课程列表</router-link></li>
           <li :class="{hover:$route.name == 'mycourseList'}"><router-link :to="{name:'mycourseList'}" target="_blank">我的课程</router-link></li>
-          <li :class="{hover:$route.name == 'exam'}"><router-link :to="{name:'exam'}" target="_blank">考试中心</router-link></li>
+          <li :class="{hover:$route.name == 'exam'}"><router-link :to="{name:'userfinish'}" target="_blank">考试中心</router-link></li>
+          <!-- <li :class="{hover:$route.name == 'exam'}"><router-link :to="{name:'exam'}" target="_blank">考试中心</router-link></li> -->
         </ul>
       </el-col>
       <el-col :span="6" class="nav-btn">

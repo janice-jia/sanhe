@@ -6,64 +6,48 @@
         <el-carousel trigger="click" height="400px">
           <el-carousel-item v-for="item in BannerList" :interval="5000" :key="item.id">
             <!-- <h3>{{ item }}</h3> -->
-            <img :src="item.imgurl" :alt="item.bannername">
+            <img :src="GLOBAL.webUrl+item.logoUrl" :alt="item.bannername">
           </el-carousel-item>
         </el-carousel>
       </div>
       
       <!-- 导航 -->
       <div class="sh-menu">
-        <el-tabs v-model="activeNavName" type="card" @tab-click="changeCourse">
-          <el-tab-pane 
-            v-for="item in MajorList" 
-            :key="item.id" 
-            :label="item.coursename" 
-            :name="'name'+item.id">
 
-            <!-- 视频 -->
-            <div class="sh-video-tab">
-              <el-tabs v-model="currentPeriodid" @tab-click="handelGetCourseList">
-                <el-tab-pane v-for="examItem in PeriodList"  :key="examItem.id" :label="examItem.periodname" :name="'periodid'+examItem.id">
-                  <!-- 考试item -->
-                  <div class="sh-exam-item">
-                    <el-row :gutter="20">
-                      <el-col :span="12" v-for="clist in CourseList" :key="clist.id">
-                        <div class="sh-exam-item-box">
-                          <div class="grid-content bg-purple">
-                            <img v-if="!clist.logo_url" src="../assets/img/exam-default.jpg" alt="">
-                            <img v-if="clist.logo_url" :src="clist.logo_url" :alt="clist.coursename">
-                          </div>
-                          <div class="info">
-                            <!-- tit-v  tit-p tit-w -->
-                            <div class="tit ">{{clist.examinationname}}</div>
-                            <div class="desc">授课老师：杨华</div>
-                            <div class="num">
-                              <span>得分：{{clist.points ? clist.points : 0}}</span>
-                              <span>试题量：{{clist.questionscount}}道</span>
-                            </div>
-                            <div class="link">
-                              <router-link v-if="clist.examstate != '已考试'" class="btn btn-hover" 
-                                :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,'currentPageName': clist.examinationname}}" target="_blank">
-                                <span v-if="clist.examstate == '未考试'">去考试</span>    
-                                <span v-if="clist.examstate == '考试中'">继续考试</span>    
-                              </router-link>
-                              <router-link v-if="clist.examstate == '已考试'" class="btn btn-hover" 
-                                :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':item.coursename,pageuse:'see','currentPageName': clist.examinationname}}" target="_blank">
-                                <span v-if="clist.examstate == '已考试'">考题查看</span>    
-                              </router-link>
-                            </div>
-                          </div>
-                        </div>
-                      </el-col>
-                    </el-row>
+      <div class="sh-video-tab">
+        <div class="sh-exam-item">
+          <el-row :gutter="20">
+            <el-col :span="12" v-for="clist in myExamList" :key="clist.id">
+              <div class="sh-exam-item-box">
+                <div class="grid-content bg-purple">
+                  <img v-if="!clist.logoUrl" src="../assets/img/exam-default.jpg" alt="">
+                  <img v-if="clist.logoUrl" :src="GLOBAL.webUrl+clist.logoUrl" :alt="clist.courseName">
+                </div>
+                <div class="info">
+                  <!-- tit-v  tit-p tit-w -->
+                  <div class="tit ">{{clist.courseName}}</div>
+                  <div class="desc">授课老师：杨华</div>
+                  <div class="num">
+                    <span>得分：{{clist.points ? clist.points : 0}}</span>
+                    <span>试题量：{{clist.questionsCount}}道</span>
                   </div>
-                </el-tab-pane>
-              </el-tabs>
-            </div>
-
-
-          </el-tab-pane>
-        </el-tabs>
+                  <div class="link">
+                    <router-link v-if="clist.examState != '已考试'" class="btn btn-hover" 
+                      :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':clist.examState,'currentPageName': clist.courseName}}" target="_blank">
+                      <span v-if="clist.examState == '未考试'">去考试</span>    
+                      <span v-if="clist.examState == '考试中'">继续考试</span>    
+                    </router-link>
+                    <router-link v-if="clist.examState == '已考完'" class="btn btn-hover" 
+                      :to="{name:'examInfo', params: {courseid: clist.id},query:{'type':clist.examState,pageuse:'see','currentPageName': clist.courseName}}" target="_blank">
+                      <span v-if="clist.examState == '已考完'">考题查看</span>    
+                    </router-link>
+                  </div>
+                </div>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
       </div>
       
     </div>
@@ -80,38 +64,19 @@ export default {
       menuid: null,
       BannerList:[],
       // 课程列表
-      CourseList: [],
-      MajorList: [],
-      // 学期列表
-      PeriodList:[],
-      marjorId:null,
-      CurrentUserId: this.GLOBAL.CurrentUserId,
-      currentPeriodid:null
+      myExamList: [],
+      studentId: this.GLOBAL.studentId
     }
   },
   mounted(){
     // 幻灯片
-    this.GetBanner()
-    // 课程列表
-    this.GetMajorList()
+    // this.GetBanner()
+    // 考试列表列表
+    this.GetMyExamList()
   },
   components: {
   },
   methods: {
-    // 学期点击事件
-    handelGetCourseList(tab, event){
-      console.log(tab, event);
-      // 获取学期下的列表
-      this.GetCourseList(this.marjorId, this.PeriodList[tab.index].id)
-    },
-    // 切换专业选项卡
-    changeCourse(tab, event) {
-      // console.log('tab', tab);
-      // console.log('event', event);
-      // 获取课程下的学期列表
-      this.marjorId = this.MajorList[tab.index].id
-      this.GetPeriodList(this.MajorList[tab.index].id)
-    },
     GetBanner(){
       this.$http.get('/API/Advertisement.ashx?command=GetBanner').then(function (res) {
         this.BannerList = res.body.dataList || []
@@ -119,37 +84,12 @@ export default {
       })
     },
     // 课程列表
-    GetCourseList(courseid,periodid){
-      if(!courseid) return;
-      this.$http.get('/API/Exam/ExaminationPaper.ashx?command=GetExaminationsByCourseId&majorid=' + this.GLOBAL.MajorId +'&courseid='+courseid+'&periodid='+periodid+'&userid='+this.GLOBAL.CurrentUserId
-).then(function (res) {
-        this.CourseList = res.body.dataList
-        // this.activeVideoType = 'activeVideoType0'
-        //  console.info('this.CourseList', this.CourseList)
-      })
-    },
-    // 专业列表
-    GetMajorList(){
-      this.$http.get('/API/Exam/Course.ashx?command=GetCourseListByMajorId&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
-        this.MajorList = res.body.dataList
-        if(this.MajorList[0].id){
-          this.activeNavName = 'name'+this.MajorList[0].id
-
-          // 获取学期列表
-          this.marjorId = this.MajorList[0].id
-          this.GetPeriodList(this.MajorList[0].id)
-        }
-      })
-    },
-    // 学期列表
-    GetPeriodList(courseid){
-      this.$http.get('/API/Study/Course.ashx?command=GetCoursePeriodByCourseId&courseid=' + courseid  +'&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
-        this.PeriodList = res.body.dataList
-        this.currentPeriodid = 'periodid'+this.PeriodList[0].id
-        console.info('this.currentPeriodid', this.currentPeriodid)
-
-        // 获取课程列表
-        this.GetCourseList(courseid, this.PeriodList[0].id)
+    GetMyExamList(){
+      this.$http.post('/api/examPaper/myExamList', {
+        'examState': '已考完',
+        'studentId': this.GLOBAL.studentId,
+      }).then(function (res) {
+        this.myExamList = res.body.data
       })
     }
   }

@@ -14,7 +14,7 @@ Vue.use(VueDirectiveImagePreviewer)
 Vue.use(VueCookies) 
 
 // 测试---设置cookie
-Vue.$cookies.set("studentId","50000")
+Vue.$cookies.set("studentId","50001")
 Vue.$cookies.set("CurrentUserName","王娇")
 Vue.$cookies.set("MajorId","22")
 
@@ -22,7 +22,7 @@ let studentId = Vue.$cookies.get('studentId')
 let CurrentUserName = Vue.$cookies.get('CurrentUserName')
 let MajorId = Vue.$cookies.get('MajorId') || 20
 // let webUrl = window.location.host
-let webUrl = 'http://39.106.82.162:9088'
+let webUrl = 'https://resmpapi.bjzdyh.com'
 // console.info('webUrl', webUrl)
 
 Vue.prototype.GLOBAL = {
