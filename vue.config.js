@@ -43,13 +43,15 @@ module.exports = {
     // proxy: 'http://localhost:4000' // 配置跨域处理,只有一个代理
     proxy: {
         //接口地址转发 
-        '/API': {
-            target: 'http://47.92.34.245:9000',
+        '/api': {
+            // target: 'http://rxhgzh.natapp1.cc/',
+            // target: 'http://39.106.82.162:9088/',
+            target: 'https://resmpapi.bjzdyh.com',
             ws: true,
             changeOrigin: true,
-            pathRewrite: {
-              '^/API': '/API'
-            }
+            // pathRewrite: {
+            //   '^/API': '/API'
+            // }
         }
     }
   }

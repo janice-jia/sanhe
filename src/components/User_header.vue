@@ -7,11 +7,11 @@
             <img src="../assets/img/avatars.jpg" alt="">
           </div>
           <div class="info">
-            <p class="name">{{myInfo.grade}}-{{myInfo.realname}}</p>
+            <p class="name">{{myInfo.gradename}}-{{myInfo.name}}</p>
             <p class="s-info">
-              <span>学号：{{myInfo.student_num}}</span>
-              <span>班级：{{myInfo.classroom}}</span>
-              <span>专业：{{myInfo.major}}</span>
+              <span>学号：{{myInfo.xh}}</span>
+              <span>班级：{{myInfo.executiveclass}}</span>
+              <span>专业：{{myInfo.majorinreading}}</span>
             </p>
           </div>
         </div>
@@ -20,6 +20,7 @@
             <li :class="{hover:$route.name == 'userfinish'}"><router-link :to="{name:'userfinish'}">已完成</router-link></li>
             <li :class="{hover:$route.name == 'userexaming'}"><router-link :to="{name:'userexaming'}">考试中</router-link></li>
             <li :class="{hover:$route.name == 'userexamfinish'}"><router-link :to="{name:'userexamfinish'}">已考试</router-link></li>
+            <li :class="{hover:$route.name == 'userspace'}"><router-link :to="{name: 'userspace', params: {'studentSpaceId': 0}}">个人空间</router-link></li>
             <li :class="{hover:$route.name == 'usermessage'}"><router-link to="usermessage">个人空间</router-link></li>
           </ul>
         </div>
@@ -42,7 +43,9 @@ export default {
   },
   methods: {
     GetUserInfo(){
-      this.$http.get('/API/My/MyInfo.ashx?command=GetMyInfo&userid='+this.GLOBAL.CurrentUserId).then(function (res) {
+      this.$http.post('/api/index/getStudentById',{
+        'studentId': this.GLOBAL.studentId
+      }).then(function (res) {
         this.myInfo = res.body.data || {}
       })
     }

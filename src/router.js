@@ -11,6 +11,7 @@ import ExamSubmit from './views/ExamSubmit.vue'
 import CourseInfo from './views/Course_info.vue'
 import Usermessage from './views/User_message.vue'
 import Userfinish from './views/User_finish.vue'
+import UserSpace from './views/UserSpace.vue'
 import UserExamFinish from './views/User_exam_finish.vue'
 import UserExaming from './views/User_examing.vue'
 Vue.use(Router)
@@ -101,6 +102,12 @@ export default new Router({
             path: '/userexaming',
             name: 'userexaming',
             component: UserExaming
+        },
+        // 用户-个人空间
+        {
+            path: '/userspace:studentSpaceId',
+            name: 'userspace',
+            component: UserSpace
         }
     ]
 })
