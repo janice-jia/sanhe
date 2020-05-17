@@ -137,7 +137,7 @@
               </div>
 
               <!-- 留言评论 -->
-              <div v-if="item.periodId == 'message'">
+              <div class="qa-container" v-if="item.periodId == 'message'">
                 <div class="qa-textarea">
                   <el-input
                     type="textarea"
@@ -152,16 +152,74 @@
                 <div style="clear:both"></div>
                 <div class="qa-list">
                   <p>全部评论  {{comPageConfig.total}}</p>
-                  <div class="qa-item" v-for="(item,index) in commentList" :key="index">
-                    <div class="Q">
-                      Q：{{item.contect}}
-                    </div>
-                    <div class="A" v-if="!item.answerVoList || item.answerVoList.length == 0 ">
-                      A：暂无回答
-                    </div>
-                    <div class="A" v-for="(a, aindex) in item.answerVoList" :key="aindex">
-                      A：{{a.contect}}
-                    </div>
+                  <div class="com-list">
+                    <el-row>
+                      <el-col class="com-item" :span="24">
+                        <table style="width:100%">
+                          <colgroup>
+                            <col style="width:8%">
+                            <col style="width:90%">
+                          </colgroup>
+                          <tbody  v-for="(item, i) in commentList" :key="i">
+                            <tr>
+                              <td>
+                                <el-avatar size="large" src="circleUrl">
+                                  {{item.fromName}}
+                                </el-avatar>
+                              </td>
+                              <td>
+                                <p class="name">{{item.fromName}}</p>
+                                <p class="content">{{item.content ? item.content : '内容为空'}}</p>
+                                <p class="timeZan">
+                                  <span class="time">{{item.createTime}}</span>
+                                  <span class="like" @click="subLike(item)">{{item.likeNum}}</span>
+                                  <span class="replay" @click="replayId = item.commentId"> </span>
+                                </p>
+                              </td>
+                            </tr>
+                            <tr v-if="replayId == item.commentId">
+                              <td></td>
+                              <td>
+                                <div class="replay-msg">
+                                  <p>回复:@{{item.createTime}}</p>
+                                  <textarea v-model="replayCon" name="" id="" cols="30" rows="10" placeholder="请输入文字…"></textarea>
+                                  <button class="btn btn-hover" @click="doReplay(item)">发表</button>
+                                </div>
+                              </td>
+                            </tr>
+
+                            <!-- 回复 -->
+                            <tr>
+                              <td>
+                              </td>
+                              <td>
+                                <table style="background:rgba(244,244,244,1); width:100%; border-radius:5px;
+">
+                                  <colgroup>
+                                    <col style="width:10%">
+                                    <col style="width:90%">
+                                  </colgroup>
+                                  <tr v-for="(replay,reindex) in item.replyList" :key="reindex">
+                                    <td>
+                                      <el-avatar style="margin-left 10px" size="large" src="circleUrl">
+                                        {{replay.fromName}}
+                                      </el-avatar>
+                                    </td>
+                                    <td>
+                                      <p class="name">{{replay.fromName}}</p>
+                                      <p class="content">{{replay.content ? replay.content : '内容为空'}}</p>
+                                      <p class="timeZan">
+                                        <span class="time">{{replay.createTime}}</span>
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </el-col>
+                    </el-row>
                   </div>
                 </div>
 
@@ -237,7 +295,7 @@ export default {
       // GetCourseStudyTimes
       // 学习总分数
       studytimes: 0,
-
+      replayId: null,
 
       // 问答相关
       qaList:[],
@@ -253,6 +311,7 @@ export default {
       comment:{
         content: ''
       },
+      replayCon: '',
       commentList: [],
       comPageConfig:{
         pageNum: 1,
@@ -346,7 +405,7 @@ export default {
         this.getquestionAnswer()
       }else if(this.periodid == 'message'){
         // 获取留言列表
-        // /api/questionAnswer/list
+        this.getCommentList()
       }else{
         // 获取课程列表
         // console.info('periodid', periodid)
@@ -533,11 +592,16 @@ export default {
     },
     // 提交评论
     subComment(){
+      if(!this.comment.content) {
+        this.$message.error('请填写评论内容');
+        return false
+      }
       this.$http.post('/api/comment/subComment', {
-        "contect": this.comment.content,
+        "commentId": 0,
+        "content": this.comment.content,
         "fromUid": this.GLOBAL.studentId,
         "fromName": this.GLOBAL.CurrentUserName,
-        "topicId": this.$route.params.courseid
+        // "topicId": this.$route.params.courseid
         // "topicName": "string"
       }).then(function(res){
         if(res.data.code == 0){
@@ -559,7 +623,45 @@ export default {
       }).then(function(res){
         console.info('res.data', res.data)
         this.commentList = res.data.data.rows || []
+        for(var i = 0;i < this.commentList.length; i++){
+          this.commentList[i].replay = false
+        }
         this.comPageConfig.total = res.data.data.total
+      })
+    },
+    // 回复
+    doReplay(item){
+      if(!this.replayCon){
+        this.$message.error('请填写回复内容');
+        return false
+      }
+      this.$http.post('/api/comment/subCommentReply', {
+        "commentId": item.commentId,
+        "content": this.replayCon,
+        "fromUid": this.GLOBAL.studentId,
+        "fromName": this.GLOBAL.CurrentUserName,
+        "toUid": item.fromUid
+      }).then(function(res){
+        if(res.data.code == 0){
+          this.$message.success('提交成功');
+          this.replayCon = ''
+          this.replayId = null
+          this.getCommentList()
+        }else{
+          this.$message.error(res.body.msg || '提交失败！');
+        }
+      })
+    },
+    subLike(item){
+      this.$http.post('/api/comment/subCommentLikeNum',{
+        "commentId": item.commentId
+      }).then(function(res){
+        if(res.data.code == 0){
+          this.$message.success('点赞成功');
+          this.getCommentList()
+        }else{
+          this.$message.error(res.body.msg || '点赞失败！');
+        }
       })
     }
   }
@@ -831,6 +933,87 @@ export default {
         font-weight:400;
         color:rgba(102,102,102,1);
         line-height:30px;
+      }
+    }
+  }
+  .com-list{
+    .com-item{
+      tr{
+        td{
+          padding: 10px 0 5px 0;
+          vertical-align: top;
+        }
+      }
+      .name{
+        font-size:16px;
+        font-weight:400;
+        color:rgba(51,51,51,1);
+        padding-top: 5px;
+      }
+      .content{
+        font-size:14px;
+        font-weight:400;
+        color:rgba(102,102,102,1);
+        padding-top: 5px;
+      }
+      .timeZan{
+        padding-top: 10px;
+      }
+      .time{
+        font-size:12px;
+        font-weight:400;
+        color:rgba(153,153,153,1);
+        display: inline-block;
+        width: 200px;
+      }
+      .like{
+        margin-left: 355px;
+        display: inline-block;
+        width: 50px;
+        height: 100%;
+        padding:5px 5px 0 20px;
+        background: url(../assets/img/like-d.png) no-repeat;
+        background-size: 16px 18px;
+        &:hover{
+          background: url(../assets/img/like-h.png) no-repeat;
+          background-size: 16px 18px;
+          color: #3333FF;
+        }
+      }
+      .replay{
+        display: inline-block;
+        width: 20px;
+        height: 18px;
+        background: url(../assets/img/m-d.png) no-repeat left bottom;
+        background-size: 20px 16px;
+        &:hover{
+          background: url(../assets/img/m-h.png) no-repeat left bottom;
+          background-size: 20px 16px;
+        }
+      }
+    }
+    .replay-msg{
+      margin-top: 15px;
+      background:rgba(244,244,244,1);
+      border-radius:5px;
+      padding: 10px;
+      p{
+        margin-bottom: 10px;
+      }
+      textarea{
+        height: 110px;
+        width: 100%;
+        border: 1px solid #e5e5e5;
+        padding: 20px;
+        font-size: 16px;
+        line-height: 22px;
+        color: #999999;
+        resize: none;
+        border-radius: 5px;
+      }
+      button{
+        margin-top: 17px;
+        float: right;
       }
     }
   }
