@@ -102,8 +102,8 @@ export default {
     },
     // 获取试卷下一题
     GetNext(){
-      if(!this.selectedAnswer && this.$route.query.pageuse != 'see'){
-        this.$message.error('请选择答案');
+      if(!this.selectedAnswer){
+        this.$message.error('选择答案不能为空');
         return
       }
       
@@ -113,7 +113,7 @@ export default {
         'selectedAnswer': this.selectedAnswer,
         'userId': + this.GLOBAL.studentId
       }).then(function (res) {
-        if(res.status !== 200){
+        if(res.body.code != 0){
           this.$message.error(res.body.msg || '获取下一题失败');
           return
         }

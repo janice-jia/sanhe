@@ -104,14 +104,17 @@
                     show-word-limit
                   >
                   </el-input>
-                  <button class="btn btn-hover">提交</button>
+                  <button class="btn btn-hover" @click="subQuestion">提交</button>
                 </div>
                 <div style="clear:both"></div>
-                <div class="qa-list" v-for="(item,index) in qaList" :key="index">
+                <div class="qa-list">
                   <p>全部问答  {{qaPageConfig.total}}</p>
-                  <div class="qa-item">
+                  <div class="qa-item" v-for="(item,index) in qaList" :key="index">
                     <div class="Q">
                       Q：{{item.contect}}
+                    </div>
+                    <div class="A" v-if="!item.answerVoList || item.answerVoList.length == 0 ">
+                      A：暂无回答
                     </div>
                     <div class="A" v-for="(a, aindex) in item.answerVoList" :key="aindex">
                       A：{{a.contect}}
@@ -135,7 +138,45 @@
 
               <!-- 留言评论 -->
               <div v-if="item.periodId == 'message'">
-                留言评论
+                <div class="qa-textarea">
+                  <el-input
+                    type="textarea"
+                    placeholder="请输入文字……"
+                    v-model="comment.content"
+                    maxlength="100"
+                    show-word-limit
+                  >
+                  </el-input>
+                  <button class="btn btn-hover" @click="subComment">提交</button>
+                </div>
+                <div style="clear:both"></div>
+                <div class="qa-list">
+                  <p>全部评论  {{comPageConfig.total}}</p>
+                  <div class="qa-item" v-for="(item,index) in commentList" :key="index">
+                    <div class="Q">
+                      Q：{{item.contect}}
+                    </div>
+                    <div class="A" v-if="!item.answerVoList || item.answerVoList.length == 0 ">
+                      A：暂无回答
+                    </div>
+                    <div class="A" v-for="(a, aindex) in item.answerVoList" :key="aindex">
+                      A：{{a.contect}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pagination">
+                  <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    prev-text= "上一页"
+                    next-text= "下一页"
+                    :page-size="comPageConfig.pageSize"
+                    :current-page="comPageConfig.pageNum"
+                    @current-change="changePageCom"
+                    :total="comPageConfig.total">
+                  </el-pagination>
+                </div>
               </div>
             </el-tab-pane>
             <!-- <el-tab-pane label="第二学期" name="second">
@@ -204,6 +245,16 @@ export default {
         question: ''
       },
       qaPageConfig:{
+        pageNum: 1,
+        pageSize: 20,
+        total: 0
+      },
+      // 评论相关
+      comment:{
+        content: ''
+      },
+      commentList: [],
+      comPageConfig:{
         pageNum: 1,
         pageSize: 20,
         total: 0
@@ -397,6 +448,11 @@ export default {
       this.pageNum = val
       this.getquestionAnswer()
     },
+    changePageCom(val){
+      // QA分页查询
+      this.pageNum = val
+      this.getCommentList()
+    },
     findWareList(periodId){
       // 获取课程列表
       let THIS = this
@@ -412,7 +468,7 @@ export default {
         setTimeout(function(){
           THIS.$http.post('/api/courseDetail/getStudySchedule', {
             'majorId': THIS.$route.query.majorId,
-            // 'periodId': periodId,
+            'periodId': periodId,
             'courseId': THIS.$route.params.courseid,
             'studentId': THIS.GLOBAL.studentId
           }).then(function (res) {
@@ -455,6 +511,56 @@ export default {
         }
       })
       if(done()) done();
+    },
+    // 提交问答
+    subQuestion(){
+      this.$http.post('/api/questionAnswer/subQuestionAnswer', {
+        "contect": this.qa.question,
+        "questionUserId": this.GLOBAL.studentId,
+        "questionUserName": this.GLOBAL.CurrentUserName,
+        "topicId": this.$route.params.courseid
+        // "topicName": "string"
+      }).then(function(res){
+        if(res.data.code == 0){
+          this.$message.success('提交成功');
+          this.qa.question = ''
+          this.getquestionAnswer()
+        }else{
+          this.$message.error(res.body.msg || '提交失败！');
+        }
+      })
+      
+    },
+    // 提交评论
+    subComment(){
+      this.$http.post('/api/comment/subComment', {
+        "contect": this.comment.content,
+        "fromUid": this.GLOBAL.studentId,
+        "fromName": this.GLOBAL.CurrentUserName,
+        "topicId": this.$route.params.courseid
+        // "topicName": "string"
+      }).then(function(res){
+        if(res.data.code == 0){
+          this.$message.success('提交成功');
+          this.comment.content = ''
+          this.getCommentList()
+        }else{
+          this.$message.error(res.body.msg || '提交失败！');
+        }
+      })
+    },
+    // 获取评论列表
+    getCommentList(){
+      // 获取问答列表
+      this.$http.post('/api/comment/list', {
+        "pageNum": this.comPageConfig.pageNum,
+        "pageSize": this.comPageConfig.pageSize,
+        "topicId": this.$route.params.courseid
+      }).then(function(res){
+        console.info('res.data', res.data)
+        this.commentList = res.data.data.rows || []
+        this.comPageConfig.total = res.data.data.total
+      })
     }
   }
 }

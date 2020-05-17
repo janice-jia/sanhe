@@ -45,7 +45,7 @@
                         </router-link>
                         <div class="btn">
                           <button v-if="clist.isSignUp == 1" @click="changeSignUp(clist)">定制</button>
-                          <button v-if="clist.isSignUp == 0" @click="changeSignUp(clist)" class="gray">已定制</button>
+                          <button v-if="clist.isSignUp == 0" class="gray">已定制</button>
                         </div>
                         <!-- <div class="desc">授课老师：杨华</div> -->
                         
@@ -138,9 +138,122 @@
             </el-row>
           </el-tab-pane>
           <!-- 学习时长排名   end -->
-          <el-tab-pane label="活跃度排名" name="second">活跃度排名</el-tab-pane>
-          <el-tab-pane label="课件点击率排名" name="third">课件点击率排名</el-tab-pane>
-          <el-tab-pane label="最受欢迎课程排名" name="fourth">最受欢迎课程排名</el-tab-pane>
+          <el-tab-pane label="活跃度排名" name="second">
+            
+            <el-row>
+              <el-col :span="24">
+                <!-- 昨日 -->
+                <table style="width:80%" class="rankTable">
+                  <colgroup>
+                    <col style="width:30%">
+                    <col style="width:12%">
+                    <col style="width:38%">
+                    <col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <th align="left">排名数值</th>
+                    <th></th>
+                    <th align="left">姓名</th>
+                    <th align="right">班级</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, i) in activityList" :key="i">
+                      <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
+                        <span v-if="i > 2">{{i}}</span>  
+                      </td>
+                      <td>
+                        <el-avatar size="large" src="circleUrl">
+                          {{item.studentName}}
+                        </el-avatar>
+                      </td>
+                      <td>
+                        <p>{{item.studentName}}</p>
+                      </td>
+                      <td align="right">{{item.className}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="nullCon" v-if="!activityList || activityList.length == 0">暂无数据</p>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="课件点击率排名" name="third">
+            
+            <el-row>
+              <el-col :span="24">
+                <!-- 昨日 -->
+                <table style="width:80%" class="rankTable">
+                  <colgroup>
+                    <col style="width:30%">
+                    <col style="width:12%">
+                    <col style="width:38%">
+                    <col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <th align="left">排名数值</th>
+                    <!-- <th></th> -->
+                    <th align="left">课件名称</th>
+                    <th align="right">点击次数</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, i) in wareClickRateList" :key="i">
+                      <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
+                        <span v-if="i > 2">{{i}}</span>  
+                      </td>
+                      <!-- <td>
+                        <el-avatar size="large" src="circleUrl">
+                          {{item.studentName}}
+                        </el-avatar>
+                      </td> -->
+                      <td>
+                        <p>{{item.fileName}}</p>
+                      </td>
+                      <td align="right">{{item.wareId}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="nullCon" v-if="!wareClickRateList || wareClickRateList.length == 0">暂无数据</p>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="最受欢迎课程排名" name="fourth">
+            <el-row>
+              <el-col :span="24">
+                <!-- 昨日 -->
+                <table style="width:80%" class="rankTable">
+                  <colgroup>
+                    <col style="width:30%">
+                    <col style="width:12%">
+                    <col style="width:38%">
+                    <col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <th align="left">排名数值</th>
+                    <!-- <th></th> -->
+                    <th align="left">课程名称</th>
+                    <th align="right">课程类型</th>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, i) in coursePopularList" :key="i">
+                      <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
+                        <span v-if="i > 2">{{i}}</span>  
+                      </td>
+                      <!-- <td>
+                        <el-avatar size="large" src="circleUrl">
+                          {{item.studentName}}
+                        </el-avatar>
+                      </td> -->
+                      <td>
+                        <p>{{item.courseName}}</p>
+                      </td>
+                      <td align="right">{{item.courseType}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="nullCon" v-if="!coursePopularList || coursePopularList.length == 0">暂无数据</p>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
         </el-tabs>
       </div>
       
@@ -166,6 +279,8 @@ export default {
       yestodayList: [],
       // 活跃度排名
       activityList: [],
+      // 点击率排行
+      wareClickRateList: [],
       // 受欢迎的课件
       coursePopularList:[]
     }
@@ -178,6 +293,10 @@ export default {
     // 学习时长
     this.getStudyTimeList()
     // 活跃度排名
+    this.getActivityList()
+    // 课件点击活跃度排名
+    this.getWareClickRateList()
+    // 最受欢迎课程排名
     this.getActivityList()
     // 收欢迎的课件
     this.getCoursePopularList()
@@ -260,6 +379,12 @@ export default {
     getActivityList(){
       this.$http.post('/api/index/activityList').then(function (res) {
         this.activityList = res.body.data
+      })
+    },
+    // 课件点击率排名
+    getWareClickRateList(){
+      this.$http.post('/api/index/wareClickRateList').then(function (res) {
+        this.wareClickRateList = res.body.data
       })
     },
     // 收欢迎的课件

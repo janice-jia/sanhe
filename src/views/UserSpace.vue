@@ -3,19 +3,17 @@
     <div class="container">
       <UserHeader></UserHeader>
         <div class="space-file-getlist">
-            <span>全部文件</span>
-            <span>图片</span>
-            <span>视频</span>
-            <span>文档</span>
+            <span :class="{'blue':fileType=='全部文件'}" @click="changeFileType('全部文件')">全部文件</span>
+            <span :class="{'blue':fileType=='图片'}" @click="changeFileType('图片')">图片</span>
+            <span :class="{'blue':fileType=='视频'}" @click="changeFileType('视频')">视频</span>
+            <span :class="{'blue':fileType=='文档'}" @click="changeFileType('文档')">文档</span>
         </div>
 
       <div class="sh-user-space">
         <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i">
-                <router-link :push="{ name:'userspace', params:{studentSpaceId: item.id}}">
-                    {{item.name}}
-                </router-link>
+            <el-breadcrumb-item :to="{name: 'userspace', params: {'studentSpaceId': 0}}" :if="fileType == '全部文件'">全部文件</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" :push="{ name:'userspace', params:{studentSpaceId: item.id}}">
+                {{item.name}}
             </el-breadcrumb-item>
         </el-breadcrumb>
         <div class="spce-btns">
@@ -42,14 +40,7 @@
                     </el-upload>
                 </el-col>
                 <el-col :span="4" v-for="(item, i) in spaceList" :key="i">
-
-                    <div @click="goPath(item)" :class="{
-                        'space-file': true, 
-                        'space-file-png':item.fileType=='图片', 
-                        'space-file-video':item.fileType=='视频', 
-                        'space-file-path':item.fileType=='文件夹', 
-                        'space-file-defult':item.fileType=='文档'
-                    }">
+                    <div class="space-file">
                         <div class="space-hand">
                             <i class="download" v-if="item.fileType !== '文件夹'" @click="fileDownload" title="下载">
                                 <a :href="GLOBAL.webUrl+item.fileUrl">
@@ -60,8 +51,17 @@
                                 <img src="../assets/img/file-del.png" alt="">
                             </i>
                         </div>
-                        <p class="tit">{{item.fileName}}</p>
+                        <div @click="goPath(item)" :class="{
+                            'space-file-png':item.fileType=='图片', 
+                            'space-file-video':item.fileType=='视频', 
+                            'space-file-path':item.fileType=='文件夹', 
+                            'space-file-defult':item.fileType=='文档'
+                        }">
+                            
+                            <p class="tit">{{item.fileName}}</p>
+                        </div>
                     </div>
+                    
                 </el-col>
             </el-row>
         </div>
@@ -69,7 +69,6 @@
 
         <el-dialog title="新建文件夹" :visible.sync="dialogFormVisible">
             <el-form :model="form" label-width="100px">
-                
                 <el-form-item label="上级目录">
                     {{parentName}}
                 </el-form-item>
@@ -101,10 +100,12 @@ export default {
             "name": "全部文件"
         }],
         parentName: '全部文件',
+        fileType:'全部文件',
         parentId: 0
     }
   },
   mounted(){
+    //   this.getSpaceMeum()
       this.getSpace()
   },
   components: {
@@ -125,15 +126,25 @@ export default {
             }
         })
     },
+    changeFileType(fileType){
+        this.fileType = fileType
+        this.getSpace()
+    },
     // 个人空间列表
     getSpace(){
-        this.parentId = (this.$route.params.studentSpaceId ? this.$route.params.studentSpaceId : 0)
-        this.getSpaceMeum(this.parentId)
-        this.$http.post('/api/studentSpace/list', {
-            "parentId": this.parentId,
-            "fileName": '全部文件',
+
+        let studentSpaceId = this.$route.params.studentSpaceId
+        var paramsD = {
+            "parentId": studentSpaceId,
             "studentId": this.GLOBAL.studentId
-        }).then(function(res){
+        }
+        // 文件类型
+        if(this.fileType !=='全部文件') {
+            paramsD.fileType = this.fileType
+        }
+        // 获取路径
+        this.getSpaceMeum()
+        this.$http.post('/api/studentSpace/list', paramsD).then(function(res){
             if(res.data.code == 0){
                 this.spaceList = res.body.data.rows
             }else{
@@ -145,10 +156,11 @@ export default {
     addPath(){
         this.$http.post('/api/studentSpace/subStudentSpace', {
             "parentId": this.$route.params.studentSpaceId,
-            "parentName": '全部文件',
+            // "parentName": '全部文件',
             "fileName": this.form.name,
             "fileType": "文件夹",
             "studentId": this.GLOBAL.studentId,
+            "studentName": this.GLOBAL.CurrentUserName
         }).then(function(res){
             console.info('res', res)
             if(res.body.code == 0){
@@ -215,7 +227,10 @@ export default {
             var queryData = {studentSpaceId:info.studentSpaceId}
             this.$router.push({
                 name: 'userspace', 
-                params: {studentSpaceId:info.studentSpaceId}
+                params: {studentSpaceId:info.studentSpaceId},
+                query: {
+                    parentId: this.parentId
+                }
             })
         }
     }
@@ -236,8 +251,12 @@ export default {
     margin: 30px;
     span{
         padding: 0 20px;
+        cursor: pointer;
         &.hover{
             background: rgba(51,51,255,1);
+        }
+        &.blue{
+            color: rgba(51,51,255,1);
         }
     }
     
@@ -276,7 +295,6 @@ export default {
         margin-top: 30px;
         .space-file{
             height: 170px;
-            padding-top: 120px;
             position: relative;
             cursor: pointer;
             &:hover{
@@ -319,15 +337,23 @@ export default {
             }
         }
         .space-file-png{
+            height: 100%;
+            padding-top: 120px;
             background:  url('../assets/img/file-png.png') no-repeat center 10px;
         }
         .space-file-video{
+            height: 100%;
+            padding-top: 120px;
             background:  url('../assets/img/file-video.png') no-repeat center 10px;
         }
         .space-file-path{
+            height: 100%;
+            padding-top: 120px;
             background:  url('../assets/img/filePath.png') no-repeat center 10px;
         }
         .space-file-defult{
+            height: 100%;
+            padding-top: 120px;
             background:  url('../assets/img/file-default.png') no-repeat center 10px;
         }
     }
