@@ -166,7 +166,7 @@ export default {
         'userId': + this.GLOBAL.studentId
       }).then(function (res) {
         console.info('res', res)
-        if(res.status == 200){
+        if(res.data.code == 0){
           this.$router.push({name: 'examSubmit', query:{type:this.$route.query.type,currentPageName: this.$route.query.currentPageName}})
         }else{
           this.$message.error('提交失败');

@@ -118,7 +118,7 @@ export default {
         'selectedAnswer': this.selectedAnswer,
         'userId': + this.GLOBAL.studentId
       }).then(function (res) {
-        if(res.status !== 200){
+        if(res.data.code == 0){
           this.$message.error(res.body.data.msg || '获取下一题失败');
           return
         }
@@ -171,7 +171,7 @@ export default {
         'userId': + this.GLOBAL.studentId
       }).then(function (res) {
         console.info('res', res)
-        if(res.status == 200){
+        if(res.data.code == 0){
           this.$router.push({name: 'examSubmit', query:{type:this.$route.query.type,currentPageName: this.$route.query.currentPageName}})
         }else{
           this.$message.error('提交失败');

@@ -349,7 +349,7 @@ export default {
         "studentId": this.GLOBAL.studentId
       }).then(function (res) {
         // console.info('res', res)
-        if(res.status == 200){
+        if(res.data.code == 0){
           this.$message.success('定制成功');
         }else{
           this.$message.error(res.data.msg || '定制失败');
