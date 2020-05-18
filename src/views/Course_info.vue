@@ -495,7 +495,8 @@ export default {
       this.$http.post('/api/questionAnswer/list', {
         "pageNum": this.qaPageConfig.pageNum,
         "pageSize": this.qaPageConfig.pageSize,
-        "topicId": this.$route.params.courseid
+        "topicId": this.$route.params.courseid,
+        "topicName": this.CourseInfo.courseName
       }).then(function(res){
         console.info('res.data', res.data)
         this.qaList = res.data.data.rows || []
@@ -640,7 +641,8 @@ export default {
         "content": this.replayCon,
         "fromUid": this.GLOBAL.studentId,
         "fromName": this.GLOBAL.CurrentUserName,
-        "toUid": item.fromUid
+        "toUid": item.fromUid,
+        "topicName": item.courseName
       }).then(function(res){
         if(res.data.code == 0){
           this.$message.success('提交成功');
