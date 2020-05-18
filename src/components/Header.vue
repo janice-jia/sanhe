@@ -15,7 +15,7 @@
         </ul>
       </el-col>
       <el-col :span="6" class="nav-btn">
-        <router-link class="btn btn-hover" to="usermessage" target="_blank">
+        <router-link class="btn btn-hover" to="userfinish" target="_blank">
           个人中心
         </router-link>
         <button class="btn" @click="logout">

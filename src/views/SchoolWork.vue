@@ -118,7 +118,7 @@ export default {
         'selectedAnswer': this.selectedAnswer,
         'userId': + this.GLOBAL.studentId
       }).then(function (res) {
-        if(res.data.code == 0){
+        if(res.data.code != 0){
           this.$message.error(res.body.data.msg || '获取下一题失败');
           return
         }

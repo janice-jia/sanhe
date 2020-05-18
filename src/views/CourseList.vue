@@ -52,7 +52,7 @@
               </router-link>
                 <div class="btn">
                   <button v-if="clist.isSignUp == 1" @click="changeSignUp(clist)">定制</button>
-                  <button v-if="clist.isSignUp == 0" @click="changeSignUp(clist)" class="gray">已定制</button>
+                  <button v-if="clist.isSignUp == 0" class="gray">已定制</button>
                 </div>
                 <!-- <div class="desc">授课老师：杨华</div> -->
               

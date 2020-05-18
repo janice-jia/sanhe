@@ -18,7 +18,7 @@ Vue.use(VueCookies)
 // Vue.$cookies.set("CurrentUserName","王娇")
 // Vue.$cookies.set("MajorId","22")
 
-let webUrl = window.location.host
+let webUrl = window.location.origin
 let studentId = Vue.$cookies.get('studentId')
 let CurrentUserName = Vue.$cookies.get('CurrentUserName')
 let MajorId = Vue.$cookies.get('MajorId') || 20
