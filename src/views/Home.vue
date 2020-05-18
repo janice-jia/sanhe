@@ -208,7 +208,7 @@
                       <td>
                         <p>{{item.fileName}}</p>
                       </td>
-                      <td align="right">{{item.wareId}}</td>
+                      <td align="right">{{item.clickCount}}</td>
                     </tr>
                   </tbody>
                 </table>
