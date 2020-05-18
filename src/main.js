@@ -14,16 +14,16 @@ Vue.use(VueDirectiveImagePreviewer)
 Vue.use(VueCookies) 
 
 // 测试---设置cookie
-// Vue.$cookies.set("studentId","50001")
-// Vue.$cookies.set("CurrentUserName","王娇")
-// Vue.$cookies.set("MajorId","22")
+Vue.$cookies.set("studentId","50001")
+Vue.$cookies.set("CurrentUserName","王娇")
+Vue.$cookies.set("MajorId","22")
 
 let webUrl = window.location.host
 let studentId = Vue.$cookies.get('studentId')
 let CurrentUserName = Vue.$cookies.get('CurrentUserName')
 let MajorId = Vue.$cookies.get('MajorId') || 20
 // 测试
-// webUrl = 'https://resmpapi.bjzdyh.com'
+webUrl = 'https://resmpapi.bjzdyh.com'
 // console.info('webUrl', webUrl)
 
 Vue.prototype.GLOBAL = {

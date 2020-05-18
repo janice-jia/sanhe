@@ -433,9 +433,9 @@ export default {
       this.timer = setInterval(function(){
         _this.actuallytime += 1
       },1000)
-      if(ware.filetype != '视频' && ware.filetype != 'PDF'){
+      if(ware.fileType != '视频' && ware.fileType != 'PDF'){
         playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileUrl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
-        this.$alert(playDom, ware.filetname, {
+        this.$alert(playDom, ware.filetName, {
           confirmButtonText: '关闭',
           dangerouslyUseHTMLString: true,
           callback: action => {
@@ -445,7 +445,7 @@ export default {
             this.SetCourseWareStudySchedule()
           }
         });
-      }else if(ware.filetype == 'PDF'){
+      }else if(ware.fileType == 'PDF'){
         this.dialogTableVisible = true
         let options = {
           //禁用工具栏代码

@@ -6,7 +6,7 @@
         <el-carousel trigger="click" height="400px">
           <el-carousel-item v-for="item in BannerList" :interval="5000" :key="item.id">
             <!-- <h3>{{ item }}</h3> -->
-            <img :src="GLOBAL.webUrl+item.logoUrl" :alt="item.bannername">
+            <img :src="GLOBAL.webUrl+item.imgUrl" :alt="item.bannername">
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -85,7 +85,7 @@
                   <tbody>
                     <tr v-for="(item, i) in todayList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 3">{{i}}</span>  
+                        <span v-if="i > 2">{{i+1}}</span>  
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -119,7 +119,7 @@
                   <tbody>
                     <tr v-for="(item, i) in yestodayList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 3">{{i}}</span>  
+                        <span v-if="i > 2">{{i+1}}</span> 
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -159,7 +159,7 @@
                   <tbody>
                     <tr v-for="(item, i) in activityList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 3">{{i}}</span>  
+                        <span v-if="i > 2">{{i+1}}</span> 
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -185,8 +185,8 @@
                 <table style="width:80%" class="rankTable">
                   <colgroup>
                     <col style="width:30%">
-                    <col style="width:12%">
-                    <col style="width:38%">
+                    <!-- <col style="width:12%"> -->
+                    <col style="width:50%">
                     <col style="width:20%">
                   </colgroup>
                   <thead>
@@ -198,7 +198,7 @@
                   <tbody>
                     <tr v-for="(item, i) in wareClickRateList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 3">{{i}}</span>  
+                        <span v-if="i > 2">{{i+1}}</span> 
                       </td>
                       <!-- <td>
                         <el-avatar size="large" src="circleUrl">
@@ -223,8 +223,8 @@
                 <table style="width:80%" class="rankTable">
                   <colgroup>
                     <col style="width:30%">
-                    <col style="width:12%">
-                    <col style="width:38%">
+                    <!-- <col style="width:12%"> -->
+                    <col style="width:50%">
                     <col style="width:20%">
                   </colgroup>
                   <thead>
@@ -236,7 +236,7 @@
                   <tbody>
                     <tr v-for="(item, i) in coursePopularList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 3">{{i}}</span>  
+                        <span v-if="i > 2">{{i+1}}</span> 
                       </td>
                       <!-- <td>
                         <el-avatar size="large" src="circleUrl">
@@ -317,7 +317,7 @@ export default {
       this.$http.post('/api/index/bannerList').then(function (res) {
         // res.body = this.formatterNavVal(res.body, 'shipcompany')
         this.BannerList = res.body.data || []
-        // console.info('this.BannerList', this.BannerList)
+        console.info('this.BannerList', this.BannerList)
       })
     },
     // 课程列表
