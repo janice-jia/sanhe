@@ -41,7 +41,7 @@ export default {
     logout(){
       console.info('logout')
       // 清除cookie 
-      this.$cookies.remove("CurrentUserId");
+      this.$cookies.remove("studentId");
       this.$cookies.remove("CurrentUserName");
       this.$cookies.remove("MajorId");
       let _this = this
