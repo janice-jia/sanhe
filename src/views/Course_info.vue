@@ -434,7 +434,7 @@ export default {
         _this.actuallytime += 1
       },1000)
       if(ware.filetype != '视频' && ware.filetype != 'PDF'){
-        playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileurl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
+        playDom = `<iframe src="https://view.officeapps.live.com/op/view.aspx?src=${ware.fileUrl}" scrolling="auto" frameborder="0"  style="width: 100%;height: 100%;min-height:${this.clientHeight-150}px;"></iframe>`
         this.$alert(playDom, ware.filetname, {
           confirmButtonText: '关闭',
           dangerouslyUseHTMLString: true,
@@ -460,12 +460,12 @@ export default {
         }; 
 
         setTimeout(function(){
-          pdf.embed(ware.fileurl, "#video", options);  
+          pdf.embed(ware.fileUrl, "#video", options);  
         }, 300)
       } else {
         // 视频
         this.dialogTableVisible = true
-        let fileType = ware.fileurl.substring(ware.fileurl.length-3,ware.fileurl.length);
+        let fileType = ware.fileUrl.substring(ware.fileUrl.length-3,ware.fileUrl.length);
         setTimeout(function(){
           var videoObject = {
             container: '#video', //容器的ID或className
@@ -479,12 +479,12 @@ export default {
             //debug:true,
             wh:'16:9',
             video:[
-                [ware.fileurl, 'video/'+fileType, '中文标清', 0],
+                [ware.fileUrl, 'video/'+fileType, '中文标清', 0],
             ]
           };
           var player = new ckplayer(videoObject);
         }, 500)
-        // playDom = `<video src="${ware.fileurl}" width="100%" height="92%" style="max-width:100%;max-height:100%" controls="controls">
+        // playDom = `<video src="${ware.fileUrl}" width="100%" height="92%" style="max-width:100%;max-height:100%" controls="controls">
         //         您的浏览器不支持 video 标签。
         //         </video>`
       }
