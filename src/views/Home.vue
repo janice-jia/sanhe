@@ -85,7 +85,7 @@
                   <tbody>
                     <tr v-for="(item, i) in todayList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 2">{{i}}</span>  
+                        <span v-if="i > 3">{{i}}</span>  
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -119,7 +119,7 @@
                   <tbody>
                     <tr v-for="(item, i) in yestodayList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 2">{{i}}</span>  
+                        <span v-if="i > 3">{{i}}</span>  
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -159,7 +159,7 @@
                   <tbody>
                     <tr v-for="(item, i) in activityList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 2">{{i}}</span>  
+                        <span v-if="i > 3">{{i}}</span>  
                       </td>
                       <td>
                         <el-avatar size="large" src="circleUrl">
@@ -198,7 +198,7 @@
                   <tbody>
                     <tr v-for="(item, i) in wareClickRateList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 2">{{i}}</span>  
+                        <span v-if="i > 3">{{i}}</span>  
                       </td>
                       <!-- <td>
                         <el-avatar size="large" src="circleUrl">
@@ -236,7 +236,7 @@
                   <tbody>
                     <tr v-for="(item, i) in coursePopularList" :key="i">
                       <td :class="{first:i == 0, second:i == 1, third:i == 2, pl17:i > 2}">
-                        <span v-if="i > 2">{{i}}</span>  
+                        <span v-if="i > 3">{{i}}</span>  
                       </td>
                       <!-- <td>
                         <el-avatar size="large" src="circleUrl">
