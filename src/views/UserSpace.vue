@@ -188,7 +188,7 @@ export default {
     // 文件上传成功回调，，指定文件夹，，默认文件夹-全部文件
     doUploadSubmit(fileParams){
         var paramsD = {
-            "parentId": this.parentId,
+            "parentId": this.$route.params.studentSpaceId,
             "fileName": (fileParams.fileName ? fileParams.fileName : '全部文件夹'),
             "fileType": fileParams.fileType,
             // "fileType": fileParams.fileType,
