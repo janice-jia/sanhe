@@ -33,7 +33,8 @@ Vue.prototype.GLOBAL = {
   'webUrl': webUrl
 
 }
-
+console.info('进入首页获取studentId====', studentId)
+console.info('进入首页获取CurrentUserName====', CurrentUserName)
 // 验证是否登录
 if(!studentId || !CurrentUserName) 
 window.location.href = '/api/index/login'

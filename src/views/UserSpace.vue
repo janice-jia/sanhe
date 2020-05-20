@@ -3,20 +3,26 @@
     <div class="container">
       <UserHeader></UserHeader>
         <div class="space-file-getlist">
-            <span :class="{'blue':fileType=='全部文件'}" @click="changeFileType('全部文件')">全部文件</span>
+            <!-- <span :class="{'blue':fileType=='全部文件'}" @click="changeFileType('全部文件')">全部文件</span> -->
             <span :class="{'blue':fileType=='图片'}" @click="changeFileType('图片')">图片</span>
             <span :class="{'blue':fileType=='视频'}" @click="changeFileType('视频')">视频</span>
             <span :class="{'blue':fileType=='文档'}" @click="changeFileType('文档')">文档</span>
         </div>
 
       <div class="sh-user-space">
-        <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{name: 'userspace', params: {'studentSpaceId': 0}}" :if="fileType == '全部文件'">全部文件</el-breadcrumb-item>
-            <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" :push="{ name:'userspace', params:{studentSpaceId: item.id}}">
-                {{item.name}}
-            </el-breadcrumb-item>
-        </el-breadcrumb>
+          <el-row style="border-bottom:1px solid #ccc">
+                <el-breadcrumb separator="/">
+                    <!-- <el-breadcrumb-item :to="{name: 'userspace', params: {'studentSpaceId': 0}}" :if="fileType == '全部文件'">全部文件</el-breadcrumb-item> -->
+                    <el-breadcrumb-item v-for="(item, i) in breadcrumbList" :key="i" :to="{ name:'userspace', params:{studentSpaceId: item.id}}">
+                        {{item.name}}
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
+          </el-row>
+        
         <div class="spce-btns">
+            <button @click="backurl" v-if="breadcrumbList.length > 1" class="btn btn-hover">
+                返回
+            </button>
             <button class="btn btn-hover">上传</button>
             <!-- <button class="btn">下载</button> -->
             <button class="btn" @click="dialogFormVisible = true">新建文件夹</button>
@@ -112,6 +118,18 @@ export default {
     UserHeader
   },
   methods: {
+    backurl(){
+        // 返回上一级
+        var queryD = {}
+        if(this.$route.query.parentId != 0){
+            queryD.parentId = this.breadcrumbList[this.breadcrumbList.length-1].id
+        }
+        this.$router.push({
+            name: 'userspace', 
+            params: {studentSpaceId: this.$route.query.parentId},
+            query: queryD
+        })
+    },
     getSpaceMeum(id){
         if(this.$route.params.studentSpaceId == 0) return
         this.$http.post('/api/studentSpace/getSpaceMeum',{
@@ -263,7 +281,7 @@ export default {
 }
 .sh-user-space{
     background: #ffffff;
-    padding: 40px;
+    padding: 20px 40px 40px 40px;
 
     .el-dialog__wrapper{
         .el-dialog{
@@ -364,5 +382,12 @@ export default {
         height: 170px;
     }
     // 上传按++end
+
+    .el-breadcrumb{
+        font-size: 16px;
+        height: 40px;
+        line-height: 40px;
+        margin-bottom: 10px;
+    }
 }
 </style>

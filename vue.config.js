@@ -12,7 +12,7 @@ module.exports = {
       // 模板来源
       template: 'index.html',
       // 在 dist/index.html 的输出
-      filename: 'index.html',
+      filename: 'templates/sanheIndex.htm',
       // 当使用 title 选项时，
       // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
       title: 'Index Page',
@@ -26,6 +26,9 @@ module.exports = {
     // 输出文件名会被推导为 `subpage.html`。
     // subpage: 'src/subpage/main.js'
   },
+  assetsDir: './',
+  baseUrl: './../',
+  outputDir: 'dist',
   css: {
     loaderOptions: {
       postcss: {
