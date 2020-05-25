@@ -44,6 +44,7 @@ export default {
       this.$cookies.remove("studentId");
       this.$cookies.remove("CurrentUserName");
       this.$cookies.remove("MajorId");
+      this.$cookies.remove("JSESSIONID");
       let _this = this
       setTimeout(function(){
         _this.$router.go(0)
