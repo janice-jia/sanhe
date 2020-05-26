@@ -12,9 +12,9 @@ module.exports = {
       // 模板来源
       template: 'index.html',
       // 在 dist/index.html 的输出
-      // 打包时
-      // filename: 'index.html',
       // 运行时
+      // filename: 'index.html',
+      // 打包时
       filename: 'templates/sanheIndex.htm',
       // 当使用 title 选项时，
       // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>

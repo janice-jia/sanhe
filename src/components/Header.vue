@@ -47,7 +47,7 @@ export default {
       this.$cookies.remove("JSESSIONID");
       let _this = this
       setTimeout(function(){
-        _this.$router.go(0)
+        window.location.href = '/'
       },300)
     }
   }
