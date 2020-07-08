@@ -23,7 +23,16 @@
             <button @click="backurl" v-if="breadcrumbList.length > 1" class="btn btn-hover">
                 返回
             </button>
-            <button class="btn btn-hover">上传</button>
+            <!-- <button class="btn btn-hover">上传</button> -->
+            <el-upload
+                class="upload-btn"
+                action="/api/common/upload"
+                accept=".xls,.xlsx,.bmp,.gif,.jpg,.jpeg,.png,.doc,.docx,.txt,.ppt,.pptx,.pdf,.AVI,.avi,.mov,.rmvb,.rm,.FLV,.mp4,3GP,.rar,.zip,.gz,.bz2"
+                :before-upload="beforeUpload"
+                :on-success="handleUploadSuccess"
+                multiple>
+                <el-button size="medium" type="primary">上传</el-button>
+            </el-upload>
             <!-- <button class="btn">下载</button> -->
             <button class="btn" @click="dialogFormVisible = true">新建文件夹</button>
         </div>
@@ -307,6 +316,20 @@ export default {
         }
         .btn-hover{
             background:rgba(51,51,255,1);
+        }
+        .upload-btn{
+            float: left;
+            height: 40px;
+            margin-right: 20px;
+            .el-upload{
+                height: 100%;
+            }
+            .el-button--medium{
+                height: 100%;
+                padding-top: 0;
+                padding-bottom: 0;
+                font-size: 18px;
+            }
         }
     }
     .space-list{
