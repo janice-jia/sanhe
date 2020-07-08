@@ -47,7 +47,7 @@ export default {
       this.$cookies.remove("JSESSIONID");
       let _this = this
       setTimeout(function(){
-        window.location.href = '/'
+        window.location.href = '/api/index/logout'
       },300)
     }
   }
