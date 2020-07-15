@@ -578,8 +578,8 @@ export default {
         "contect": this.qa.question,
         "questionUserId": this.GLOBAL.studentId,
         "questionUserName": this.GLOBAL.CurrentUserName,
-        "topicId": this.$route.params.courseid
-        // "topicName": "string"
+        "topicId": this.$route.params.courseid,
+        "topicName": this.CourseInfo.courseName
       }).then(function(res){
         if(res.data.code == 0){
           this.$message.success('提交成功');
@@ -602,8 +602,8 @@ export default {
         "content": this.comment.content,
         "fromUid": this.GLOBAL.studentId,
         "fromName": this.GLOBAL.CurrentUserName,
-        // "topicId": this.$route.params.courseid
-        // "topicName": "string"
+        "topicId": this.$route.params.courseid,
+        "topicName": this.CourseInfo.courseName
       }).then(function(res){
         if(res.data.code == 0){
           this.$message.success('提交成功');
