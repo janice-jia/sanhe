@@ -33,7 +33,7 @@ module.exports = {
   assetsDir: './',
   publicPath: '/',
   outputDir: 'dist',
-
+  productionSourceMap: false,
   css: {
     loaderOptions: {
       postcss: {
