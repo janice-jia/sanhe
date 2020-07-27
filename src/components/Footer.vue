@@ -1,7 +1,7 @@
 <template>
   <div class="Footer">
     <div class="container">
-      <p>三河职教非全日制远程教育系统</p>
+      <p>三河市职业技术教育中心</p>
       <p>©2009-2018 Aliyun.com 版权所有 ICP证: 浙B2-20080101</p>
     </div>
   </div>
