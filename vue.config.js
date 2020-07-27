@@ -5,6 +5,8 @@ const postcss = px2rem({
 })
 
 module.exports = {
+  // 去除打包后的.map文件
+  productionSourceMap: false,
   pages: {
     index: {
       // page 的入口
