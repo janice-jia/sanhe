@@ -24,12 +24,52 @@
         
         <!-- 题目 -->
         <div class="sh-examquestion-con">
-            <div class="q-name">{{examCon.ordervalue}}、{{examCon.question}}</div>
+            <!-- 题目 -->
+            <div class="q-name flex-item">
+              <div class="flex-item-ele">{{examCon.ordervalue}}、</div>
+              <div class="flex-item-ele" v-html="examCon.question"></div>
+            </div>
+
             <div class="q-list">
-              <p><el-radio v-model="currentanswer" label="A">A: {{examCon.option1}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='A'" class="answer">正确答案 A: {{examCon.option1}}</span></p>
-              <p><el-radio v-model="currentanswer" label="B">B: {{examCon.option2}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='B'" class="answer">正确答案 B: {{examCon.option2}}</span></p>
-              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="C">C: {{examCon.option3}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='C'" class="answer">正确答案 C: {{examCon.option3}}</span></p>
-              <p v-if="examCon.questionstype == '单选'"><el-radio v-model="currentanswer" label="D">D: {{examCon.option4}}</el-radio><span v-if="$route.query.pageuse=='see' && examCon.answer=='D'" class="answer">正确答案 D: {{examCon.option4}}</span></p>
+              <!-- A -->
+              <div class="flex-item">
+                <div class="flex-item-ele"><el-radio v-model="currentanswer" label="A">A: </el-radio></div>
+                <div class="flex-item-ele" v-html="examCon.option1"></div>
+              </div>
+              <div class="flex-item flex-right" v-if="$route.query.pageuse=='see' && examCon.answer=='A'">
+                <div class="flex-item-ele answer">正确答案 A:</div>
+                <div class="flex-item-ele answer" v-html="examCon.option1"></div>
+              </div>
+              <!-- B -->
+              <div class="flex-item">
+                <div class="flex-item-ele"><el-radio v-model="currentanswer" label="B">B: </el-radio></div>
+                <div class="flex-item-ele" v-html="examCon.option2"></div>
+              </div>
+              <div class="flex-item-ele" v-if="$route.query.pageuse=='see' && examCon.answer=='B'" >
+                <div class="flex-item-ele answer">正确答案 B:</div>
+                <div class="flex-item-ele answer" v-html="examCon.option2"></div>
+              </div>
+
+              <!-- C -->
+              <div class="flex-item" v-if="examCon.questionstype == '单选'">
+                <div class="flex-item-ele"><el-radio v-model="currentanswer" label="C">C: </el-radio></div>
+                <div class="flex-item-ele" v-html="examCon.option3"></div>
+              </div>
+              <div class="flex-item-ele" v-if="$route.query.pageuse=='see' && examCon.answer=='C'">
+                <div class="flex-item-ele answer">正确答案 C: </div>
+                <div class="flex-item-ele answer" v-html="examCon.option3"></div>
+              </div>
+
+              <!-- D -->
+              <div class="flex-item" v-if="examCon.questionstype == '单选'">
+                <div class="flex-item-ele"><el-radio v-model="currentanswer" label="D">D: </el-radio></div>
+                <div class="flex-item-ele" v-html="examCon.option4"></div>
+              </div>
+              <div class="flex-item-ele" v-if="$route.query.pageuse=='see' && examCon.answer=='D'">
+                <div class="flex-item-ele answer">正确答案 D: </div>
+                <div class="flex-item-ele answer" v-html="examCon.option4"></div>
+              </div>
+
             </div>
             <div class="q-progress">
               <el-progress :percentage="progress" :text-inside="true" :color="customColor" :format="format"></el-progress>
@@ -184,12 +224,7 @@ export default {
           .el-radio__inner{
             border-color: #3333ff;
           }
-          .answer{
-            position: absolute;
-            right: 0;
-            border: 0;
-            color: red;
-          }
+          
           .is-checked{
             .el-radio__inner{
               background: #3333ff;
@@ -199,6 +234,23 @@ export default {
             }
           }
         }
+        .answer{
+          color: red;
+        }
+      }
+      .flex-item{
+        display: flex;
+        margin:5px 0 10px 0;
+        .flex-item-ele{
+          padding-right: 10px;
+          p{
+            margin: 0!important;
+            padding: 0!important;
+          }
+        }
+      }
+      .flex-right{
+        justify-content:flex-end;
       }
       .q-curent{
         text-align: center;
